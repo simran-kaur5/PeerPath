@@ -1,0 +1,92 @@
+.delete-post-page {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 24px;
+    background: #f3f2ef;
+}
+
+.delete-post-card {
+    width: 100%;
+    max-width: 400px;
+    padding: 28px;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+    text-align: center;
+}
+
+.delete-post-icon {
+    width: 54px;
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 16px;
+    color: #dc2626;
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-radius: 12px;
+}
+
+.delete-post-card h2 {
+    margin: 0 0 10px;
+    color: #1e293b;
+    font-size: 22px;
+    font-weight: 650;
+}
+
+.delete-post-message {
+    margin: 0 0 24px;
+    color: #64748b;
+    font-size: 14px;
+    line-height: 1.7;
+}
+
+.delete-post-error {
+    margin-bottom: 16px;
+    text-align: left;
+}
+
+.delete-post-card .confirm-delete-button {
+    min-height: 44px;
+    margin-bottom: 10px;
+    background: #dc2626;
+    border-radius: 8px;
+    box-shadow: none;
+    text-transform: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.delete-post-card .confirm-delete-button:hover {
+    background: #b91c1c;
+    box-shadow: none;
+}
+
+.delete-post-card .cancel-delete-button {
+    min-height: 44px;
+    color: #475569;
+    border-color: #cbd5e1;
+    border-radius: 8px;
+    text-transform: none;
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.delete-post-card .cancel-delete-button:hover {
+    background: #f8fafc;
+    border-color: #94a3b8;
+}
+
+@media (max-width: 480px) {
+    .delete-post-page {
+        padding: 16px;
+    }
+
+    .delete-post-card {
+        padding: 24px 20px;
+    }
+}

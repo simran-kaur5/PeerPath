@@ -1,0 +1,146 @@
+.suggested-card {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 22px;
+    background: #ffffff;
+    border: 1px solid #e2e7ed;
+    border-radius: 16px;
+    box-shadow: 0 4px 18px rgba(25, 45, 75, 0.04);
+}
+
+.suggested-header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.suggested-header h2 {
+    font-family: inherit;
+    font-size: 18px;
+    font-weight: 700;
+    color: #202b38;
+    letter-spacing: -0.3px;
+    margin: 0;
+}
+
+.suggested-header p {
+    margin-top: 6px;
+    color: #7a8795;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.suggested-icon {
+    width: 40px;
+    height: 40px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 12px;
+    color: #0A66C2;
+    background: #edf5ff;
+}
+
+.suggested-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.suggested-person {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 19px 0;
+    border-bottom: 1px solid #edf0f4;
+}
+
+.suggested-avatar {
+    width: 46px !important;
+    height: 46px !important;
+    flex-shrink: 0;
+    font-size: 14px !important;
+    font-weight: 700 !important;
+}
+
+.suggested-person-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.suggested-person-info h3 {
+    margin: 2px 0 5px;
+    color: #253244;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.suggested-role {
+    color: #697787;
+    font-size: 12px;
+    line-height: 1.5;
+    /* overflow-wrap: anywhere; */
+}
+
+.mutual-connections {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 8px;
+    color: #8792a0;
+    font-size: 11px;
+}
+
+.connect-button {
+    margin-top: 11px !important;
+    min-width: 108px !important;
+    padding: 4px 15px !important;
+    border: 1px solid #0A66C2 !important;
+    border-radius: 20px !important;
+    color: #0A66C2 !important;
+    text-transform: none !important;
+    font-size: 12px !important;
+    font-weight: 600 !important;
+}
+
+.connect-button:hover {
+    background: #edf5ff !important;
+    border-width: 1.5px !important;
+}
+
+.connect-button.connected {
+    color: #596575 !important;
+    border-color: #cbd2da !important;
+    background: #f5f6f7 !important;
+}
+
+.see-all-connections {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    width: 100%;
+    margin-top: 16px;
+    padding: 10px 0 0;
+    border: none;
+    background: transparent;
+    color: #0A66C2;
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.see-all-connections:hover {
+    color: #084d91;
+}
+
+.see-all-connections span {
+    font-size: 19px;
+}
+
+@media (max-width: 760px) {
+    .suggested-card {
+        padding: 18px;
+    }
+}

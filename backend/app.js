@@ -1,0 +1,86 @@
+import express, { urlencoded } from "express"
+import cors from "cors"
+import mongoose from "mongoose";
+import post from "./routes/post.js";
+import user from "./routes/user.js"
+import session from "express-session";
+import passport from "passport";
+import dotenv from "dotenv";
+import User from "./models/User.js";
+import LocalStrategy from "passport-local"
+import MongoStore from "connect-mongo";
+
+const app = express()
+
+dotenv.config();
+
+const sessionOptions = {
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
+    store: MongoStore.create({
+        mongoUrl: process.env.MONGODB_URL,
+        collectionName: "sessions",
+        ttl: 7 * 24 * 60 * 60
+    }),
+    cookie: {
+        maxAge: 7 * 24 * 60 * 60 * 1000,
+        httpOnly: true,
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production"
+    }
+}
+
+app.use(cors({
+    origin: "http://localhost:5173",
+    credentials: true
+}));
+
+app.use(express.json())
+app.use(express.urlencoded({ extended: true }))
+app.use(session(sessionOptions))
+
+app.use(passport.initialize())
+app.use(passport.session())
+passport.use(new LocalStrategy(User.authenticate()))
+passport.serializeUser(User.serializeUser());
+passport.deserializeUser(User.deserializeUser());
+
+// Routes
+app.use("/posts", post);
+app.use("/users", user);
+
+const PORT = process.env.PORT || 5000;
+
+async function main(){
+
+    try{
+        let response = await mongoose.connect(process.env.MONGODB_URL)
+        if(response){
+            console.log("Database connected")
+        }
+    }catch(error){
+        console.log(error)
+    }
+}
+
+main()
+
+
+app.get("/",(req,res)=>{
+    res.send("Hi root")
+})
+
+app.use((err, req, res, next) => {
+    console.error("Backend error:", err);
+
+    res.status(err.statusCode || 500).json({
+        success: false,
+        message: "Something went wrong. Please try again later."
+    });
+});
+
+
+app.listen(PORT,()=>{
+    console.log("Server listing")
+})
