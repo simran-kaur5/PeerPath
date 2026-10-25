@@ -7,6 +7,8 @@ import { StatusCodes } from "http-status-codes";
 
 const router = express.Router()
 
+// router.get("/")
+
 router.post("/", isLoggedIn, async (req, res)=>{
     try{
         const {receiverId} = req.body || {}
