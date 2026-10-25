@@ -73,7 +73,7 @@ router.get("/:id",async(req,res)=>{
     }
 })
 
-router.put("/:id",isLoggedIn,validateBody, isOwner,upload.single("image"),validatePost,async(req,res)=>{
+router.put("/:id",isLoggedIn, isOwner,upload.single("image"),validateBody,validatePost,async(req,res)=>{
     try{
         const {id} = req.params
 
@@ -88,7 +88,7 @@ router.put("/:id",isLoggedIn,validateBody, isOwner,upload.single("image"),valida
 
         if(req.file){
             updateData.image = req.file.path;
-        }
+        }                
 
 
         const updatedPost = await Post.findByIdAndUpdate(

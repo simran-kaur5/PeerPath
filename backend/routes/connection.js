@@ -7,7 +7,32 @@ import { StatusCodes } from "http-status-codes";
 
 const router = express.Router()
 
-// router.get("/")
+router.get("/",isLoggedIn, async(req,res)=>{
+    try{
+        const connections = await Connection.find({
+            status : "accepted",
+            $or: [
+                {sender: req.user._id},
+                {receiver : req.user._id}
+            ]
+        }).populate("sender","username name headline profilePicture  location")
+        .populate("receiver", "username name headline profilePicture location")
+
+        const users = connections.map((connection)=>{
+            return connection.sender._id.toString() === req.user._id.toString()? 
+            connection.receiver
+            : connection.sender
+        })
+
+        res.status(200).json({ connections: users });
+    }
+    catch (error) {
+        console.error("Failed to fetch connections:", error);
+        res.status(500).json({
+            message: "Unable to load connections."
+        });
+    }
+});
 
 router.post("/", isLoggedIn, async (req, res)=>{
     try{
@@ -34,17 +59,42 @@ router.post("/", isLoggedIn, async (req, res)=>{
             })
         }
 
-        const existingReq = await Connection.findOne({
+        const existingRequest = await Connection.findOne({
             $or : [
                 { sender: senderId, receiver: receiverId },
                 { sender: receiverId, receiver: senderId }
             ]
         })
 
-        if(existingReq){
-            return res.status(StatusCodes.CONFLICT).json({
-                message: "A connection request already exists"
-            })
+        if (existingRequest) {
+            // A pending request already exists
+            if (existingRequest.status === "pending") {
+                return res.status(409).json({
+                    message: "A connection request is already pending"
+                });
+            }
+
+            // Already connected
+            if (existingRequest.status === "accepted") {
+                return res.status(409).json({
+                    message: "You are already connected"
+                });
+            }
+
+            // A previous request was rejected: allow the original sender to retry
+            if (
+                existingRequest.status === "rejected" &&
+                String(existingRequest.sender) === String(senderId)
+            ) {
+                existingRequest.status = "pending";
+                await existingRequest.save();
+
+                return res.status(200).json({
+                    message: "Connection request sent again",
+                    request: existingRequest
+            });
+
+            }
         }
 
         const request = await Connection.create({
@@ -135,7 +185,7 @@ router.patch("/:id/accept", isLoggedIn, async (req, res)=>{
     }
 })
 
-router.put("/:id/reject", isLoggedIn,  async(req,res)=>{
+router.patch("/:id/reject", isLoggedIn,  async(req,res)=>{
     try{
         if(!mongoose.isValidObjectId(req.params.id)){
             return res.status(StatusCodes.BAD_REQUEST).json({
@@ -143,7 +193,7 @@ router.put("/:id/reject", isLoggedIn,  async(req,res)=>{
             })
         }
 
-        const request = await Connection.findById({
+        const request = await Connection.findOne({
             _id : req.params.id,
             receiver : req.user._id,
             status : "pending"

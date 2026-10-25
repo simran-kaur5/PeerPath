@@ -1,68 +1,72 @@
 .suggested-card {
+    background: #ffffff;
+    border: 1px solid #e2e8f0;
+    border-radius: 14px;
+    padding: 20px;
     width: 100%;
     box-sizing: border-box;
-    padding: 22px;
-    background: #ffffff;
-    border: 1px solid #e2e7ed;
-    border-radius: 16px;
-    box-shadow: 0 4px 18px rgba(25, 45, 75, 0.04);
+    box-shadow: 0 2px 8px rgba(15, 23, 42, 0.04);
 }
 
 .suggested-header {
     display: flex;
-    align-items: flex-start;
+    align-items: center;
     justify-content: space-between;
     gap: 12px;
-    margin-bottom: 8px;
+    margin-bottom: 20px;
 }
 
 .suggested-header h2 {
-    font-family: inherit;
-    font-size: 18px;
-    font-weight: 700;
-    color: #202b38;
-    letter-spacing: -0.3px;
     margin: 0;
+    font-size: 17px;
+    font-weight: 700;
+    color: #1e293b;
 }
 
 .suggested-header p {
-    margin-top: 6px;
-    color: #7a8795;
-    font-size: 12px;
-    line-height: 1.5;
+    margin: 5px 0 0;
+    font-size: 13px;
+    color: #64748b;
 }
 
 .suggested-icon {
-    width: 40px;
-    height: 40px;
-    flex-shrink: 0;
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 42px;
+    height: 42px;
+    flex-shrink: 0;
+    color: #2563eb;
+    background: #eff6ff;
     border-radius: 12px;
-    color: #0A66C2;
-    background: #edf5ff;
 }
 
 .suggested-list {
     display: flex;
     flex-direction: column;
+    gap: 18px;
 }
 
 .suggested-person {
     display: flex;
     align-items: flex-start;
     gap: 12px;
-    padding: 19px 0;
-    border-bottom: 1px solid #edf0f4;
+    padding-bottom: 16px;
+    border-bottom: 1.9px solid #edf0f4;
+    min-width: 0;
+}
+
+.suggested-person:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
 }
 
 .suggested-avatar {
     width: 46px !important;
     height: 46px !important;
     flex-shrink: 0;
-    font-size: 14px !important;
-    font-weight: 700 !important;
+    font-weight: 700;
+    font-size: 16px !important;
 }
 
 .suggested-person-info {
@@ -71,76 +75,95 @@
 }
 
 .suggested-person-info h3 {
-    margin: 2px 0 5px;
-    color: #253244;
+    margin: 1px 0 5px;
     font-size: 14px;
     font-weight: 700;
+    color: #1e293b;
+    overflow-wrap: anywhere;
 }
 
 .suggested-role {
-    color: #697787;
+    margin: 0 0 12px;
+    color: #64748b;
     font-size: 12px;
     line-height: 1.5;
-    /* overflow-wrap: anywhere; */
-}
-
-.mutual-connections {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    margin-top: 8px;
-    color: #8792a0;
-    font-size: 11px;
+    overflow-wrap: anywhere;
 }
 
 .connect-button {
-    margin-top: 11px !important;
-    min-width: 108px !important;
-    padding: 4px 15px !important;
-    border: 1px solid #0A66C2 !important;
-    border-radius: 20px !important;
-    color: #0A66C2 !important;
     text-transform: none !important;
-    font-size: 12px !important;
     font-weight: 600 !important;
+    font-size: 12px !important;
+    border-radius: 20px !important;
+    padding: 4px 13px !important;
+    border-color: #2563eb !important;
+    color: #2563eb !important;
+    min-height: 30px !important;
 }
 
 .connect-button:hover {
-    background: #edf5ff !important;
-    border-width: 1.5px !important;
+    background: #eff6ff !important;
+    border-color: #1d4ed8 !important;
 }
 
-.connect-button.connected {
-    color: #596575 !important;
-    border-color: #cbd2da !important;
-    background: #f5f6f7 !important;
+.connect-button.Mui-disabled {
+    border-color: #cbd5e1 !important;
+    color: #64748b !important;
+    opacity: 0.9;
+}
+
+.suggested-error {
+    margin: 0 0 14px;
+    padding: 10px;
+    border-radius: 8px;
+    background: #fef2f2;
+    color: #b91c1c;
+    font-size: 13px;
+    overflow-wrap: anywhere;
 }
 
 .see-all-connections {
     display: flex;
-    justify-content: space-between;
     align-items: center;
+    justify-content: space-between;
+    gap: 10px;
     width: 100%;
-    margin-top: 16px;
-    padding: 10px 0 0;
+    margin-top: 20px;
+    padding: 12px 0 0;
     border: none;
+    border-top: 1px solid #edf0f4;
     background: transparent;
-    color: #0A66C2;
+    color: #2563eb;
     font-size: 13px;
     font-weight: 600;
     cursor: pointer;
+    text-align: left;
+    transition: color 0.2s ease;
 }
 
 .see-all-connections:hover {
-    color: #084d91;
+    color: #1d4ed8;
 }
 
 .see-all-connections span {
-    font-size: 19px;
+    font-size: 18px;
+    transition: transform 0.2s ease;
 }
 
-@media (max-width: 760px) {
+.see-all-connections:hover span {
+    transform: translateX(3px);
+}
+
+@media (max-width: 480px) {
     .suggested-card {
-        padding: 18px;
+        padding: 15px;
+    }
+
+    .suggested-header h2 {
+        font-size: 16px;
+    }
+
+    .suggested-person {
+        gap: 10px;
     }
 }

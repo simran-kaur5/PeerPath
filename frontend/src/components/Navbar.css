@@ -95,3 +95,11 @@
 .nav-link:hover {
     color: #0a66c2;
 }
+
+.options > div {
+    cursor: pointer;
+}
+
+.options > div:hover {
+    color: #0a66c2;
+}

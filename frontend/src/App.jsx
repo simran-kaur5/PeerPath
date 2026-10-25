@@ -12,6 +12,7 @@ import EditProfile from "./pages/EditProfile";
 import People from "./components/People";
 import PublicView from "./pages/PublicView";
 import ConnectionRequests from "./components/ConnectionRequests";
+import MyConnections from "./components/MyConnections";
 
 function EditPostPage() {
     const { id } = useParams();
@@ -46,6 +47,7 @@ function App() {
             {/* Other people's profiles */}
             <Route path="/people" element={<People />} />
             <Route path="/people/:id" element={<PublicView />} />
+            <Route path="/connections" element={<MyConnections />} />
 
             <Route path="/connections/requests" element={<ConnectionRequests />}/>
             

@@ -53,6 +53,18 @@ export default function Navbar(){
                 <Link to="/" className="nav-link">Explore</Link>
                 <Link to="/people" className="nav-link">People</Link>
 
+                {isLogin && (
+                    <>
+                        <div onClick={() => navigate("/connections/requests")}>
+                            Notifications
+                        </div>
+
+                        <div onClick={() => navigate("/connections")}>
+                            My Connections
+                        </div>
+                    </>
+                )}
+
                 {
                     isLogin?(
                         <>

@@ -17,8 +17,11 @@ export default function ConnectionRequests(){
     const fetchRequests = async ()=>{
         try{
             const response = await connectionAPI.get("/incoming")
-            setRequest(response.data.requests);
+            setRequest(Array.isArray(response.data.requests)
+                ? response.data.requests
+                : []);
         }catch(error){
+            console.error("Failed to fetch incoming requests:", err);
             setError(
             err.response?.data?.message || "Unable to load connection requests.");
         }finally{
@@ -37,18 +40,20 @@ export default function ConnectionRequests(){
 
             await connectionAPI.patch(`/${requestId}/${action}`)
 
-            setRequest((prev)=>{
-                prev.filter((request)=> request._id !== requestId)
-            })
-        }catch(err){
+            setRequest((prev) =>
+                prev.filter((request) => request._id !== requestId)
+            );
+        } catch (err) {
+            console.error("Failed to fetch requests:", err);
+
             setError(
                 err.response?.data?.message ||
-                `Unable to ${action} connection request.`
+                "Unable to load connection requests."
             );
         }finally{
-            setProcessingId("")
-        }
-    }
+                    setProcessingId("")
+                }
+            }
 
     return (
         <div className="requests-page">
@@ -66,7 +71,7 @@ export default function ConnectionRequests(){
 
                 {loading ? (
                 <p>Loading requests...</p>
-                ) : requests.length === 0 ? (
+                ) : (requests || []).length === 0 ? (
                 <div className="requests-empty">
                     <UserRound size={42} />
                     <h2>No pending requests</h2>

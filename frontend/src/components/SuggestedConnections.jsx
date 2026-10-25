@@ -1,53 +1,69 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar, Button } from "@mui/material";
 import { UserPlus, Users } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { userAPI, connectionAPI } from "../api";
 import "./SuggestedConnections.css";
 
-const people = [
-    {
-        id: 1,
-        name: "Aarav Sharma",
-        role: "Software Engineer at Google",
-        mutual: 12,
-        initials: "AS",
-        color: "#DCEBFA"
-    },
-    {
-        id: 2,
-        name: "Priya Mehta",
-        role: "Frontend Developer",
-        mutual: 8,
-        initials: "PM",
-        color: "#F8E5D6"
-    },
-    {
-        id: 3,
-        name: "Rahul Verma",
-        role: "AI/ML Engineering Student",
-        mutual: 15,
-        initials: "RV",
-        color: "#E4E0FA"
-    },
-    {
-        id: 4,
-        name: "Neha Gupta",
-        role: "Software Developer",
-        mutual: 6,
-        initials: "NG",
-        color: "#DDF3E4"
+export default function SuggestedConnections(){
+    const [people, setPeople] = useState([])
+    const [sentRequests, setSentRequests] = useState([])
+    const [loading, setLoading] = useState(true)
+
+    const [requestingId, setRequestingId] = useState("")
+    const [error, setError] = useState("")
+
+    const navigate = useNavigate()
+
+    useEffect(()=>{
+        const fetchSuggestions = async ()=>{
+            try{
+                const [userRes, sentRes] = await Promise.all([
+                    userAPI.get("/"),
+                    connectionAPI.get("/sent")
+                ]) 
+
+                setPeople(userRes.data.users || [])
+
+                setSentRequests(
+                    (sentRes.data.requests || []).map(
+                        (request) => request.receiver._id
+                    )
+                );
+            }catch(error){
+                console.error("Failed to load sugeestions", error)
+                setError(error.response?.data?.message ||
+                    "Unable to load suggestions.")
+            }finally{
+                setLoading(false)
+            }
+        }
+        fetchSuggestions()
+    },[])
+
+    const handleConnect = async (personId) =>{
+        try{
+            setRequestingId(personId)
+            setError("")
+
+            await connectionAPI.post("/",{
+                receiverId: personId
+            })
+
+            setSentRequests((prev)=> [...prev, personId])
+        }catch(err){
+            console.error("Failed to send connection request:", err);
+            setError(
+                err.response?.data?.message ||
+                "Unable to send connection request."
+            );
+        } finally {
+            setRequestingId("")
+        }
     }
-];
-
-export default function SuggestedConnections() {
-    const [connected, setConnected] = useState([]);
-
-    const handleConnect = (id) => {
-        setConnected((prev) =>
-            prev.includes(id)
-                ? prev.filter((item) => item !== id)
-                : [...prev, id]
-        );
-    };
+    if (loading) {
+        return <div className="suggested-card">Loading suggestions...</div>;
+    }
 
     return (
         <div className="suggested-card">
@@ -62,57 +78,64 @@ export default function SuggestedConnections() {
                 </div>
             </div>
 
+            {error && <p className="suggested-error">{error}</p>}
+
+
             <div className="suggested-list">
-                {people.map((person) => (
-                    <div className="suggested-person" key={person.id}>
-                        <Avatar
-                            className="suggested-avatar"
-                            sx={{
-                                bgcolor: person.color,
-                                color: "#263746"
-                            }}
+            {people.slice(0, 4).map((person) => (
+                <div className="suggested-person" key={person._id}>
+                    <Avatar
+                        className="suggested-avatar"
+                        src={person.profilePicture || undefined}
+                    >
+                        {!person.profilePicture &&
+                            (person.name || person.username || "U")
+
+                            .charAt(0)
+                                .toUpperCase()}
+                    </Avatar>
+
+                    <div className="suggested-person-info">
+                        <h3>{person.name || person.username}</h3>
+
+                        <p className="suggested-role">
+                            {person.headline || "PeerPath member"}
+                        </p>
+
+                        <Button
+                            variant="outlined"
+                            size="small"
+                            className="connect-button"
+                            startIcon={<UserPlus size={15} />}
+                            disabled={
+                                requestingId === person._id ||
+                                sentRequests.includes(person._id)
+                            }
+                            onClick={() => handleConnect(person._id)}
                         >
-                            {person.initials}
-                        </Avatar>
-
-                        <div className="suggested-person-info">
-                            <h3>{person.name}</h3>
-                            <p className="suggested-role">
-                                {person.role}
-                            </p>
-                            <p className="mutual-connections">
-                                <Users size={13} />
-                                {person.mutual} mutual connections
-                            </p>
-
-                            <Button
-                                variant="outlined"
-                                size="small"
-                                className={`connect-button ${
-                                    connected.includes(person.id)
-                                        ? "connected"
-                                        : ""
-                                }`}
-                                startIcon={
-                                    <UserPlus size={15} />
-                                }
-                                onClick={() =>
-                                    handleConnect(person.id)
-                                }
-                            >
-                                {connected.includes(person.id)
-                                    ? "Pending"
-                                    : "Connect"}
-                            </Button>
-                        </div>
+                            {requestingId === person._id
+                                ? "Sending..."
+                                : sentRequests.includes(person._id)
+                                ? "Request Sent"
+                                : "Connect"}
+                        </Button>
                     </div>
-                ))}
-            </div>
+                </div>
+            ))}
 
-            <button className="see-all-connections">
-                Show all suggestions
-                <span>→</span>
-            </button>
+            {people.length === 0 && (
+                <p>No new people to suggest right now.</p>
+            )}
         </div>
-    );
+
+        <button
+            className="see-all-connections"
+            onClick={() => navigate("/people")}
+        >
+            Show all suggestions
+            <span>→</span>
+        </button>
+    </div>
+);
+
 }

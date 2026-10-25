@@ -6,6 +6,7 @@ const router = express.Router()
 import { isLoggedIn, validateBody } from "../middleware.js";
 import multer from "multer";
 import { storage } from "../cloudConfig.js";
+import Connection from "../models/Connection.js";
 
 const upload = multer({ storage });
 
@@ -76,8 +77,24 @@ router.put("/me/profile-picture", isLoggedIn, upload.single("profilePicture"), a
 
 router.get("/", isLoggedIn, async(req,res)=>{
     try{
+        const connections = await Connection.find({
+            status: 'accepted',
+            $or: [
+                {sender: req.user._id},
+                {receiver: req.user._id}
+            ]
+        })
+
+        const connectedIds = connections.map((connection) =>
+            String(
+                String(connection.sender) === String(req.user._id)
+                ? connection.receiver
+                : connection.sender
+            )
+            );
+
         const users = await User.find({
-            _id: { $ne : req.user._id}
+            _id: { $nin: [req.user._id, ...connectedIds]}
     })
 
         return res.status(StatusCodes.OK).json({users})
