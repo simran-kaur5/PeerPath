@@ -41,7 +41,6 @@ router.post("/",isLoggedIn,validateBody,validatePost,upload.single("image"),asyn
 
 router.get("/", async(req,res)=>{
     try{
-        console.log("hi")
         let posts = await Post.find().populate("author","username")
                                     .sort({createdAt:-1})
 

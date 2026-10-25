@@ -7,7 +7,7 @@ import { StatusCodes } from "http-status-codes";
 
 const router = express.Router()
 
-router.post("/", async (req, res)=>{
+router.post("/", isLoggedIn, async (req, res)=>{
     try{
         const {receiverId} = req.body || {}
         const senderId = req.user._id
@@ -94,7 +94,9 @@ router.get("/sent", isLoggedIn, async(req,res)=>{
     }
 })
 
-router.patch(":/id/accept", isLoggedIn, async (req, res)=>{
+
+// accept the req
+router.patch("/:id/accept", isLoggedIn, async (req, res)=>{
     try{
         if(!mongoose.isValidObjectId(req.params.id)){
             return res.status(StatusCodes.BAD_REQUEST).json({
@@ -103,7 +105,7 @@ router.patch(":/id/accept", isLoggedIn, async (req, res)=>{
         }
 
         const request = await Connection.findOne({
-            _id : req.params.id,
+            _id : req.params.id, // connection id
             receiver : req.user._id,
             status : "pending"
         })
@@ -113,5 +115,59 @@ router.patch(":/id/accept", isLoggedIn, async (req, res)=>{
                 message : "Pending incoming req not found"
             })
         }
+
+        request.status = "accepted"
+
+        await request.save()
+
+        return res.status(StatusCodes.OK).json({
+            message : "Connection request accpeted",
+            request
+        })
+    }catch(error){
+        console.log(error)
+
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message : "Unable to accept request",
+        })
     }
 })
+
+router.put("/:id/reject", isLoggedIn,  async(req,res)=>{
+    try{
+        if(!mongoose.isValidObjectId(req.params.id)){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message : "Invalid request ID"
+            })
+        }
+
+        const request = await Connection.findById({
+            _id : req.params.id,
+            receiver : req.user._id,
+            status : "pending"
+
+        })
+
+        if(!request){
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message : "Pending incoming req not found"
+            })
+        }
+
+        request.status = "rejected"
+
+        await request.save()
+        
+        return res.status(StatusCodes.OK).json({
+            message: "Connection request rejected",
+            request
+        })
+    }catch(error){
+        console.log(error)
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            message : "Unable to reject request"
+        })
+    }
+})
+
+export default router;

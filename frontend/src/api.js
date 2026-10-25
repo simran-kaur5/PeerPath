@@ -10,4 +10,9 @@ const userAPI = axios.create({
     withCredentials: true
 });
 
-export { postAPI,userAPI};
+const connectionAPI = axios.create({
+    baseURL : "http://localhost:5000/connections",
+    withCredentials: true
+})
+
+export { postAPI,userAPI, connectionAPI};

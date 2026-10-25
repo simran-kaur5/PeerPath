@@ -4,12 +4,17 @@ import Navbar from "./Navbar";
 import { UserRound, MapPin } from "lucide-react";
 import "./People.css";
 import { useNavigate } from "react-router-dom";
+import { connectionAPI } from "../api";
+import { Button } from "@mui/material";
 
 export default function People(){
 
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("")
+    const [requestingId, setRequestingId] = useState("")
+    const [sentRequests,setSentRequests ] = useState([])
+    
     const navigate = useNavigate();
 
     useEffect(()=>{
@@ -27,8 +32,45 @@ export default function People(){
         }
 
         fetchUsers();
+        fetchSentRequests();
     },[])
+
+    const fetchSentRequests = async () => {
+        try{
+            const response = await connectionAPI.get("/sent");
+
+            const sentIds = response.data.requests.map(
+                (request) => request.receiver._id
+            )
+
+            setSentRequests(sentIds)
+            console.log(sentIds)
+        }catch (error) {
+            console.error("Failed to fetch sent requests:", error);
+        }
+    }
     
+    const handleConnect = async (e, personId)=>{
+        e.stopPropagation()
+
+        try{
+            setRequestingId(personId);
+            setError("")
+
+            await connectionAPI.post("/",{
+                receiverId: personId
+            })
+
+            setSentRequests((prev) => [...prev, personId]);
+        }catch(error){
+            console.error("Failed to send Connection req")
+
+            setError(error.response?.data?.message ||
+            "Unable to send connection request.")
+        }finally{
+            setRequestingId("")
+        }
+    }
     
     return (
     <div className="people-page">
@@ -39,6 +81,8 @@ export default function People(){
             <p className="people-subtitle">
                 Find people and grow your professional network.
             </p>
+
+            {error && <p className="people-error">{error}</p>}
             
             {loading ? (
                 <p>Loading people...</p>
@@ -78,6 +122,22 @@ export default function People(){
                                     {person.location}
                                 </p>
                             )}
+
+                            <Button
+                                variant = "contained"
+                                disabled = {
+                                    requestingId === person._id || sentRequests.includes(person._id)
+                                }
+                                onClick={(e) =>
+                                    handleConnect(e, person._id)
+                                }
+                            >
+                                {requestingId === person._id
+                                    ? "Sending..."
+                                    : sentRequests.includes(person._id)
+                                    ? "Request Sent"
+                                    : "Connect"}
+                            </Button>
                         </article>
                     ))}
                 </div>

@@ -23,11 +23,11 @@ const ConnectionSchema = new mongoose.Schema({
     { timestamps: true }
 )
  // prevent duplicate
-connectionSchema.index(
+ConnectionSchema.index(
     { sender: 1, receiver: 1 },
     { unique: true }
 );
 
-const Connection = mongoose.model("Connection", connectionSchema);
+const Connection = mongoose.model("Connection", ConnectionSchema);
 
 export default Connection;

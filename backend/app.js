@@ -9,6 +9,7 @@ import dotenv from "dotenv";
 import User from "./models/User.js";
 import LocalStrategy from "passport-local"
 import MongoStore from "connect-mongo";
+import connection from "./routes/connection.js"
 
 const app = express()
 
@@ -49,6 +50,7 @@ passport.deserializeUser(User.deserializeUser());
 // Routes
 app.use("/posts", post);
 app.use("/users", user);
+app.use("/connections",connection)
 
 const PORT = process.env.PORT || 5000;
 
