@@ -5,7 +5,7 @@ import "./Feed.css";
 import { useState } from "react";
 import { useEffect } from "react";
 import {postAPI, userAPI} from "../api";
-import { ThumbsUp } from "lucide-react";
+import { ThumbsUp,ChevronUp, ChevronDown, CornerDownLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 export default function Feed() {
@@ -14,6 +14,7 @@ export default function Feed() {
     const [error, setError] = useState("")
     const [currentUserId, setCurrentUserId] = useState("");
     const [commentInputs, setCommentInputs] = useState({});
+    const [expandedComments, setExpandedComments] = useState({});
 
     const navigate = useNavigate();
 
@@ -101,6 +102,28 @@ export default function Feed() {
             );
         }
     }
+
+    const handleDeleteComment = async (postId, commentId)=>{
+        try{
+            const response = await postAPI.delete(`/${postId}/comments/${commentId}`)
+
+            setPosts((prevPosts) => {
+                return prevPosts.map((item) => {
+                    if (item._id === postId) {
+                        return {
+                            ...item,
+                            comments: response.data.comments
+                        };
+                    }
+
+                    return item;
+                });
+        })
+        }catch(error){
+            console.log("Failed to delete comment",error)
+            setError(error.response?.data?.message || "Could not delete comment.")
+        }
+    }
     return (
         <div className="feed-container">
             <div className="feed-navbar">
@@ -125,8 +148,20 @@ export default function Feed() {
 
                             <button className="viewFull" onClick={()=> navigate(`/posts/${post._id}`)}>Full view the post</button>
 
-                            <p className="post-author">Posted by: {post.author?.username || "Unknown user"}</p>
-                            
+                            <div className="post-author">
+                                <img
+                                    src={post.author?.profilePicture || "/default-avatar.png"}
+                                    alt="Profile"
+                                    className="post-author-avatar"
+                                />
+
+                                <div className="post-author-info">
+                                    <strong>
+                                    {post.author?.name || post.author?.username || "PeerPath member"}
+                                    </strong>
+                                    <small>Posted by</small>
+                                </div>
+                                </div>
                             <p>{post.content}</p>
 
                             {post.image && (
@@ -161,10 +196,9 @@ export default function Feed() {
                                 })()}
                             </div>
 
-                            <div className="post-comments">
-                                <h4>Comments ({(post.comments || []).length})</h4>
+                           <div className="post-comments">
 
-                                <div className="comment-input-row">
+                            <div className="comment-input-row">
                                     <input
                                         type="text"
                                         placeholder="Write a comment..."
@@ -182,26 +216,57 @@ export default function Feed() {
                                     </button>
                                 </div>
 
-                                {(post.comments || []).map((comment) => (
-                                    <div className="comment-item" key={comment._id}>
-                                        <img
-                                            src={comment.author?.profilePicture || "/default-avatar.png"}
-                                            alt=""
-                                            className="comment-avatar"
-                                        />
+                                <button
+                                    className="toggle-comments"
+                                    onClick={() =>
+                                        setExpandedComments((prev) => ({
+                                            ...prev,
+                                            [post._id]: !prev[post._id]
+                                        }))
+                                    }
+                                >
+                                    <span>Comments ({(post.comments || []).length})</span>
 
-                                        <div>
-                                            <strong>
-                                                {comment.author?.name ||
-                                                comment.author?.username ||
-                                                "PeerPath member"}
-                                            </strong>
-                                            <p>{comment.text}</p>
+                                    {expandedComments[post._id] ? (
+                                        <ChevronUp size={20} />
+                                    ) : (
+                                        <ChevronDown size={20} />
+                                    )}
+                                </button>
+                                
+    
+
+                                {/* Only the existing comments expand/collapse */}
+                                {expandedComments[post._id] && (
+                                    (post.comments || []).map((comment) => (
+                                        <div className="comment-item" key={comment._id}>
+                                            <img
+                                                src={
+                                                    comment.author?.profilePicture ||
+                                                    "/default-avatar.png"
+                                                }
+                                                alt="Profile"
+                                                className="comment-avatar"
+                                            />
+
+                                            <div>
+                                                <strong>
+                                                    {comment.author?.name ||
+                                                        comment.author?.username ||
+                                                        "PeerPath member"}
+                                                </strong>
+                                                <p>{comment.text}</p>
+                                            </div>
+
+                                            {String (comment.author?._id ||  comment.author) === String(currentUserId) && (
+                                                <button className="delete-comment-button" onClick={()=> handleDeleteComment(post._id,comment._id)}>
+                                                    Delete
+                                                </button>
+                                            )}
                                         </div>
-                                    </div>
-                                ))}
+                                    ))
+                                )}
                             </div>
-
                             <small>
                                 {new Date(post.createdAt).toLocaleString()}
                             </small>

@@ -146,6 +146,54 @@ router.post("/:id/comments", isLoggedIn, async(req, res)=>{
     }
 })
 
+router.delete("/:id/comments/:commentId",isLoggedIn, async(req,res)=>{
+    try{
+        const {id, commentId} = req.params
+
+        if(!mongoose.isValidObjectId(id) || !mongoose.isValidObjectId(commentId)){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message : "Invalid post or comment ID"
+            })
+        }
+
+        const post = await Post.findById(id)
+
+        if(!post){
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message: "Post not found"
+            })
+        }
+
+        const comment = post.comments.id(commentId)
+
+        if(!comment){
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message: "Comment not found"
+            })
+        }
+
+        if(String(comment.author) !== String(req.user._id)){
+            return res.status(StatusCodes.FORBIDDEN).json({
+                message: "you can only delete your own comments"
+            })
+        }
+
+        comment.deleteOne()
+        await post.save()
+
+        res.status(StatusCodes.OK).json({
+            message : "Comment deleted sucessfully",
+            comments: post.comments
+        })
+    }catch(error){
+        console.error("Delete comment error",error)
+
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Failed to delete comment"
+        })
+    }
+})
+
 router.get("/:id",async(req,res)=>{
     try{
         let id = req.params.id;
