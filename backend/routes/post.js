@@ -42,6 +42,7 @@ router.post("/",isLoggedIn,validateBody,validatePost,upload.single("image"),asyn
 router.get("/", async(req,res)=>{
     try{
         let posts = await Post.find().populate("author","username")
+                                    .populate("comments.author", "username name profilePicture")
                                     .sort({createdAt:-1})
 
         res.status(StatusCodes.OK).json(posts)
@@ -50,6 +51,98 @@ router.get("/", async(req,res)=>{
             message:"Failed to fetch posts",
             error:error.message
         })
+    }
+})
+
+router.patch("/:id/like",isLoggedIn, async(req,res)=>{
+    try{
+        const {id} = req.params
+
+        if(!mongoose.isValidObjectId(id)){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message: "Invalid post ID"
+            })
+        }
+
+        const post = await Post.findById(id)
+
+        if(!post){
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message: "Post not found"
+            })
+        }
+
+        const userId = req.user._id
+        const alreadyLiked = post.likes.some(//at least one id
+            (likedUserId)=> likedUserId.toString() === userId.toString()
+        )
+
+        if(alreadyLiked){
+            post.likes.pull(userId)
+        }else{
+            post.likes.addToSet(userId)
+        }
+
+        await post.save()
+
+        return res.status(StatusCodes.OK).json({
+            message: alreadyLiked? "Post unliked": "Post liked",
+            likes: post.likes,
+            likeCount: post.likes.length,
+            isLiked: !alreadyLiked
+        })
+    }catch (error) {
+        console.error("Like action failed:", error);
+
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Failed to like or unlike post"
+        })
+    }
+})
+
+router.post("/:id/comments", isLoggedIn, async(req, res)=>{
+    try{
+        const {id} = req.params
+        const {text} = req.body
+
+        if(!mongoose.isValidObjectId(id)){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message: "Invaliu post ID"
+            })
+        }
+
+        if(!text || !text.trim()){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message: "Comment cannot be empty"
+            })
+        }
+
+        const post = await Post.findById(id)
+        if(!post){
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message: "Post not found"
+            }) 
+        }
+
+        post.comments.push({
+            text: text.trim(),
+            author: req.user._id
+        })
+
+        await post.save()
+
+        await post.populate("comments.author","username name profilePicture")
+
+        return res.status(StatusCodes.CREATED).json({
+            message: "Comment added",
+            comments: post.comments
+        })
+    }catch (error) {
+        console.error("Failed to add comment:", error);
+
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Failed to add comment"
+        });
     }
 })
 

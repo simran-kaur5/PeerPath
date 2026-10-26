@@ -127,14 +127,16 @@ export default function SuggestedConnections(){
                 <p>No new people to suggest right now.</p>
             )}
         </div>
-
-        <button
-            className="see-all-connections"
-            onClick={() => navigate("/people")}
-        >
-            Show all suggestions
-            <span>→</span>
-        </button>
+        {!error && (
+            <button
+                className="see-all-connections"
+                onClick={() => navigate("/people")}
+            >
+                Show all suggestions
+                <span>→</span>
+            </button>
+        )}
+        
     </div>
 );
 
