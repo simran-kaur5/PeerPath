@@ -6,6 +6,7 @@ import multer from "multer";
 import {storage} from "../cloudConfig.js"
 import mongoose from "mongoose";
 import { isLoggedIn,isOwner,validateBody } from "../middleware.js";
+import Notification from "../models/Notification.js";
 
 const upload = multer({ storage });
 
@@ -85,6 +86,16 @@ router.patch("/:id/like",isLoggedIn, async(req,res)=>{
 
         await post.save()
 
+        if(!alreadyLiked && post.author.toString() !== userId.toString()){
+            const notificaton = await Notification.create({
+                recipient: post.author,
+                sender: userId,
+                type: "like",
+                post: post._id,
+                message: `${req.user.name || "Someone"} liked you post`
+            })
+        }
+
         return res.status(StatusCodes.OK).json({
             message: alreadyLiked? "Post unliked": "Post liked",
             likes: post.likes,
@@ -130,6 +141,17 @@ router.post("/:id/comments", isLoggedIn, async(req, res)=>{
         })
 
         await post.save()
+
+        // Notify the post author only if another user comments
+        if (post.author.toString() !== req.user._id.toString()) {
+            await Notification.create({
+                recipient: post.author,
+                sender: req.user._id,
+                type: "comment",
+                post:post._id,
+                message: `${req.user.name || "Someone"} commented on your post`
+            })
+        }
 
         await post.populate("comments.author","username name profilePicture")
 

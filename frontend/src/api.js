@@ -15,4 +15,9 @@ const connectionAPI = axios.create({
     withCredentials: true
 })
 
-export { postAPI,userAPI, connectionAPI};
+const notificationAPI = axios.create({
+    baseURL: "http://localhost:5000/notifications",
+    withCredentials: true
+})
+
+export { postAPI,userAPI, connectionAPI,notificationAPI};

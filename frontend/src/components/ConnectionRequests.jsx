@@ -21,9 +21,9 @@ export default function ConnectionRequests(){
                 ? response.data.requests
                 : []);
         }catch(error){
-            console.error("Failed to fetch incoming requests:", err);
+            console.error("Failed to fetch incoming requests:", error);
             setError(
-            err.response?.data?.message || "Unable to load connection requests.");
+            error.response?.data?.message || "Unable to load connection requests.");
         }finally{
             setLoading(false)
         }

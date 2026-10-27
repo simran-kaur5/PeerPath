@@ -3,14 +3,14 @@ import mongoose from "mongoose";
 import { StatusCodes } from "http-status-codes";
 import Notification from "../models/Notification.js";
 import { isLoggedIn } from "../middleware.js";
-import { isRef } from "joi";
 
 const router = express.Router()
 
 router.get("/",isLoggedIn, async(req,res)=>{
     try{
         const notifications = await Notification.find({
-            recipient: req.user._id
+            recipient: req.user._id,
+            isRead: false
         }).populate("sender","username name profilePicture")
           .populate("post","content")
           .sort({createdAt: -1})
@@ -41,7 +41,7 @@ router.get("/unread-count",isLoggedIn, async(req,res)=>{
     }
 })
 
-router.patch(":/id/read",isLoggedIn, async(res,req)=>{
+router.patch("/:id/read",isLoggedIn, async(req,res)=>{
     try{
         const {id} = req.params
 
@@ -52,7 +52,7 @@ router.patch(":/id/read",isLoggedIn, async(res,req)=>{
         }
 
         const notification = await  Notification.findOneAndUpdate({
-            id: id,
+            _id: id,
             recipient: req.user._id
             },
             {isRead: true},
@@ -77,17 +77,24 @@ router.patch(":/id/read",isLoggedIn, async(res,req)=>{
     }
 })
 
-router.patch("read-all",isLoggedIn,async(req,res)=>{
+router.patch("/read-all",isLoggedIn,async(req,res)=>{
     try{
-        await Notification.updateMany({
+        const result = await Notification.updateMany({
             recipient: req.user._id,
             isRead: false
             },
             {$set: {isRead: true}}
         )
 
+        if (result.matchedCount === 0) {
+            return res.status(StatusCodes.OK).json({
+                message: "No unread notifications found"
+            });
+        }
+
         return res.status(StatusCodes.OK).json({
-            message: "All notifications marked as read"
+            message: "All notifications marked as read",
+            modifiedCount : result.modifiedCount
         });
     }catch (error) {
         console.error("Mark all notifications read error:", error);

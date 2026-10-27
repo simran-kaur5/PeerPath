@@ -13,6 +13,7 @@ import People from "./components/People";
 import PublicView from "./pages/PublicView";
 import ConnectionRequests from "./components/ConnectionRequests";
 import MyConnections from "./components/MyConnections";
+import Notification from "./components/Notification";
 
 function EditPostPage() {
     const { id } = useParams();
@@ -50,7 +51,7 @@ function App() {
             <Route path="/connections" element={<MyConnections />} />
 
             <Route path="/connections/requests" element={<ConnectionRequests />}/>
-            
+            <Route path="/notifications" element={<Notification/>} />
 
             <Route path="*" element={<NotFound />} />
         </Routes>

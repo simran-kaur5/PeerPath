@@ -4,6 +4,7 @@ import Connection from "../models/Connection.js";
 import User from "../models/User.js";
 import { isLoggedIn } from "../middleware.js";
 import { StatusCodes } from "http-status-codes";
+import Notification from "../models/Notification.js"
 
 const router = express.Router()
 
@@ -89,17 +90,35 @@ router.post("/", isLoggedIn, async (req, res)=>{
                 existingRequest.status = "pending";
                 await existingRequest.save();
 
+                await Notification.create({
+                    recipient: receiverId,
+                    sender: senderId,
+                    type: "connection_request",
+                    message: `${req.user.name || "Someone"} sent you a connection request`
+                })
+
                 return res.status(200).json({
                     message: "Connection request sent again",
                     request: existingRequest
             });
 
             }
+
+            return res.status(StatusCodes.CONFLICT).json({
+                message: "A connection request already exists"
+            });
         }
 
         const request = await Connection.create({
             sender : senderId,
             receiver : receiverId
+        })
+
+        await Notification.create({
+            recipient: receiverId,
+            sender: senderId,
+            type: "connection_request",
+            message: `${req.user.name || "Someone"} sent you a connection request`
         })
 
         return res.status(StatusCodes.OK).json({

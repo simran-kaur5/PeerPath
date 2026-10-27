@@ -1,13 +1,14 @@
-import { Users, UserRound } from 'lucide-react';
+import { Users, UserRound, Bell } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import "./Navbar.css"
 import { Link, useNavigate } from "react-router-dom";
-import { userAPI } from '../api';
+import { userAPI, notificationAPI} from '../api';
 
 export default function Navbar(){
 
     let [isLogin,setisLogin] = useState(!!sessionStorage.getItem("isLogin"));
     const [profilePicture, setProfilePicture] = useState("");
+    const [unreadCount, setUnreadCount] = useState(0);
 
     const navigate = useNavigate();
 
@@ -28,6 +29,24 @@ export default function Navbar(){
         fetchProfile();
     }, [isLogin]);
 
+    useEffect(() => {
+        if (!isLogin) {
+            setUnreadCount(0)
+            return;
+        }
+
+        const fetchUnreadCount = async () => {
+            try {
+                const response = await notificationAPI.get("/unread-count");
+                setUnreadCount(response.data.count)
+            } catch (error) {
+                console.error("Unable fetch unread notifications", error);
+            }
+        };
+
+        fetchUnreadCount();
+    }, [isLogin]);
+    
     const handleLogout = async ()=>{
         try{
             await userAPI.post("/logout")
@@ -58,6 +77,18 @@ export default function Navbar(){
                         <div onClick={() => navigate("/connections/requests")}>
                             Notifications
                         </div>
+
+                        <button className='notification-bell' onClick={()=> navigate("/notifications")}
+                            title='Notifications'
+                            >
+
+                                <Bell size = {22}/>
+                                {unreadCount>0 && (
+                                    <span className='notification-badge'>
+                                        {unreadCount > 99 ? "99+": unreadCount}
+                                    </span>
+                                )}
+                            </button>
 
                         <div onClick={() => navigate("/connections")}>
                             My Connections

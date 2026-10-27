@@ -1,4 +1,4 @@
-import express, { urlencoded } from "express"
+import express from "express"
 import cors from "cors"
 import mongoose from "mongoose";
 import post from "./routes/post.js";
@@ -10,6 +10,7 @@ import User from "./models/User.js";
 import LocalStrategy from "passport-local"
 import MongoStore from "connect-mongo";
 import connection from "./routes/connection.js"
+import notifications from "./routes/notifications.js"
 
 const app = express()
 
@@ -51,6 +52,7 @@ passport.deserializeUser(User.deserializeUser());
 app.use("/posts", post);
 app.use("/users", user);
 app.use("/connections",connection)
+app.use("/notifications", notifications);
 
 const PORT = process.env.PORT || 5000;
 
