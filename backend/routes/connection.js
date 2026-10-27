@@ -2,7 +2,7 @@ import express from "express";
 import mongoose from "mongoose";
 import Connection from "../models/Connection.js";
 import User from "../models/User.js";
-import { isLoggedIn } from "../middleware.js";
+import { isLoggedIn, validateBody } from "../middleware.js";
 import { StatusCodes } from "http-status-codes";
 import Notification from "../models/Notification.js"
 
@@ -35,7 +35,7 @@ router.get("/",isLoggedIn, async(req,res)=>{
     }
 });
 
-router.post("/", isLoggedIn, async (req, res)=>{
+router.post("/", isLoggedIn, validateBody,async (req, res)=>{
     try{
         const {receiverId} = req.body || {}
         const senderId = req.user._id

@@ -12,7 +12,7 @@ const upload = multer({ storage });
 
 const router = express.Router()
 
-router.post("/",isLoggedIn,validatePost,upload.single("image"),async(req,res)=>{
+router.post("/",isLoggedIn,upload.single("image"),validateBody,validatePost,async(req,res)=>{
     try{
         const {content} = req.body;
 
@@ -22,15 +22,17 @@ router.post("/",isLoggedIn,validatePost,upload.single("image"),async(req,res)=>{
             })
         }
 
-        const newpost = await Post.create({
+        const newPost = await Post.create({
             content,
             image: req.file? req.file.path:"",
             author: req.user._id
         })
 
+        console.log(newPost)
+
         res.status(StatusCodes.CREATED).json({
             message:"Post created sucessfully",
-            post: newpost
+            post: newPost
         })
     }catch(error){
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
@@ -55,7 +57,7 @@ router.get("/", async(req,res)=>{
     }
 })
 
-router.patch("/:id/like",isLoggedIn, async(req,res)=>{
+router.patch("/:id/like",isLoggedIn,async(req,res)=>{
     try{
         const {id} = req.params
 
@@ -111,14 +113,14 @@ router.patch("/:id/like",isLoggedIn, async(req,res)=>{
     }
 })
 
-router.post("/:id/comments", isLoggedIn, async(req, res)=>{
+router.post("/:id/comments", isLoggedIn,validateBody, async(req, res)=>{
     try{
         const {id} = req.params
         const {text} = req.body
 
         if(!mongoose.isValidObjectId(id)){
             return res.status(StatusCodes.BAD_REQUEST).json({
-                message: "Invaliu post ID"
+                message: "Invalid post ID"
             })
         }
 

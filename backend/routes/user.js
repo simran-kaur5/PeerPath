@@ -140,7 +140,9 @@ router.post("/register",validateBody,async (req,res,next)=>{
             })
         })
     }catch(error){
-        if(error.name === "userExistsError" || error.code === 11000){
+        if( error.name === "UserExistsError" ||
+            error.name === "MongoServerError" ||
+            error.code === 11000){
             return res.status(StatusCodes.CONFLICT).json({
                 message:"Username already exists"
             })

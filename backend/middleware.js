@@ -6,26 +6,25 @@ import mongoose from "mongoose";
 
 
 export const validatePost = (req,res,next)=>{
-    let {error} = postSchema.validate(req.body)
+    const { error } = postSchema.validate(req.body);
 
-    if(error){
-        const errMessage = error.details
+    if (error) {
+        const message = error.details
             .map((detail) => detail.message)
             .join(", ");
 
-        throw new ExpressError(400, errMessage);
-
+        throw new ExpressError(400, message);
     }
     next()
 }
 
 export const isLoggedIn = (req,res,next)=>{
     if(!req.isAuthenticated()){
+        
         return res.status(StatusCodes.UNAUTHORIZED).json({
             message:"Please log in"
         })
     }
-
     next()
 }
 

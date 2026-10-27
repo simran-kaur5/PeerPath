@@ -6,27 +6,33 @@ import { userAPI, notificationAPI} from '../api';
 
 export default function Navbar(){
 
-    let [isLogin,setisLogin] = useState(!!sessionStorage.getItem("isLogin"));
+    let [isLogin,setisLogin] = useState(false);
     const [profilePicture, setProfilePicture] = useState("");
     const [unreadCount, setUnreadCount] = useState(0);
 
     const navigate = useNavigate();
 
     useEffect(() => {
-        if (!isLogin) return;
 
-        const fetchProfile = async () => {
+        const checkLogin = async () => {
             try {
                 const response = await userAPI.get("/me");
+
+                setisLogin(true);
+                sessionStorage.setItem("isLogin", "true");
+
                 setProfilePicture(
                     response.data.user.profilePicture || ""
                 );
             } catch (error) {
-                console.log("Unable to load profile picture", error);
+                setisLogin(false);
+                sessionStorage.removeItem("isLogin");
+                setProfilePicture("");
+                setUnreadCount(0);
             }
         };
 
-        fetchProfile();
+        checkLogin();
     }, [isLogin]);
 
     useEffect(() => {
