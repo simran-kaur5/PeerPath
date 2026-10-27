@@ -116,9 +116,35 @@
     background: #f8f8f8;
 }
 
+.post-details-stats {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 18px;
+    margin-top: 4px;
+    color: #666;
+    font-size: 13px;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.post-details-stats span {
+    cursor: default;
+    transition: color 0.2s ease;
+}
+
+.post-details-stats span:hover {
+    color: #0a66c2;
+}
+
+
 @media (max-width: 600px) {
     .post-details-page {
         padding: 20px 12px;
+    }
+
+     .post-details-stats {
+        padding: 10px 12px;
+        font-size: 12px;
     }
 
     .post-card-header {

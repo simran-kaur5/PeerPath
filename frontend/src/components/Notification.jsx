@@ -3,11 +3,14 @@ import { notificationAPI } from "../api";
 import Navbar from "../components/Navbar";
 import { Bell, CheckCheck } from "lucide-react";
 import "./Notification.css";
+import { useNavigate } from "react-router-dom";
 
 export default function Notification(){
     const [notifications, setNotifications] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
+
+    const navigate = useNavigate();
 
     const fetchNotification = async()=>{
         try{
@@ -24,22 +27,37 @@ export default function Notification(){
         fetchNotification()
     },[])
 
-    const markAsRead = async(notificationId)=>{
-        try{
-            await notificationAPI.patch(`/${notificationId}/read`)
-
-            setNotifications((prev) =>
-                prev.filter(
-                    (notification) => notification._id !== notificationId
-                )
-            );
-        }catch (err) {
-            setError(
-                err.response?.data?.message ||
-                "Failed to mark notification as read"
+    const handleNotificationClick = async (notification) => {
+    try {
+        // Mark as read in the backend
+        if (!notification.isRead) {
+            await notificationAPI.patch(
+                `/${notification._id}/read`
             );
         }
+
+        // Remove it from the screen
+        setNotifications((prev) =>
+            prev.filter((item) => item._id !== notification._id)
+        );
+
+        // Navigate to the relevant page
+        if (notification.type === "connection_request") {
+            navigate("/connections/requests");
+        } else if (
+            (notification.type === "like" ||
+             notification.type === "comment") &&
+            notification.post?._id
+        ) {
+            navigate(`/posts/${notification.post._id}`);
+        }
+    } catch (err) {
+        setError(
+            err.response?.data?.message ||
+            "Failed to open notification"
+        );
     }
+    };
 
     const markAllAsRead = async () =>{
         try{
@@ -103,6 +121,8 @@ export default function Notification(){
                                 className={`notification-item ${
                                     notification.isRead ? "read" : "unread"
                                 }`}
+                                onClick={() => handleNotificationClick(notification)}
+                                style={{ cursor: "pointer" }}
                             >
                                 <img
                                     className="notification-avatar"
@@ -122,17 +142,6 @@ export default function Notification(){
                                         ).toLocaleString()}
                                     </span>
                                 </div>
-
-                                {!notification.isRead && (
-                                    <button
-                                        className="mark-read-button"
-                                        onClick={() =>
-                                            markAsRead(notification._id)
-                                        }
-                                    >
-                                        Mark read
-                                    </button>
-                                )}
                                 </div>
                         ))}
                     </div>

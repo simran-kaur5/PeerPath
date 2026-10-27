@@ -7,17 +7,65 @@ import {
     Plus
 } from "lucide-react";
 import { Button } from "@mui/material";
-import { userAPI } from "../api";
+import { userAPI,postAPI  } from "../api";
+import { useEffect } from "react";
+import "./ProfileView.css";
 
 export default function ProfileView({ user, isOwnProfile = false }) {
     const navigate = useNavigate();
     const fileInputRef = useRef(null);
+    const [posts, setPosts] = useState([]);
+    const [postsLoading, setPostsLoading] = useState(true);
+    const [postsError, setPostsError] = useState("");
 
     const [profilePicture, setProfilePicture] = useState(
         user?.profilePicture || ""
     );
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState("");
+
+
+    useEffect(()=>{
+        let active = true
+
+        const fetchUserPosts = async()=>{
+            setPostsLoading(true)
+            setPostsError("")
+
+            try{
+                const response = await postAPI.get("/")
+
+                const allPosts = response.data.posts || response.data
+
+                const profileUserId = String(user._id || user.id)
+
+                const userPosts = allPosts.filter((post)=>{
+                    const authorId = post.author?._id || post.author;
+                    return String(authorId) === profileUserId;
+                })
+
+                if (active) {
+                    setPosts(userPosts);
+                }
+            }catch (err) {
+                if (active) {
+                    setPostsError("Unable to load posts.");
+                }
+            }
+            finally {
+                if (active) {
+                    setPostsLoading(false);
+                }
+            }
+        }
+
+        if (user?._id || user?.id) {
+            fetchUserPosts();
+        }
+        return () => {
+            active = false;
+        };  
+    } ,[user?._id, user?.id])
 
     if (!user) return null;
 
@@ -155,6 +203,47 @@ export default function ProfileView({ user, isOwnProfile = false }) {
                     </a>
                 </section>
             )}
+
+            <section className="profile-section profile-posts-section">
+                <h2>Posts ({posts.length})</h2>
+
+                {postsLoading ? (
+                    <p>Loading posts...</p>
+                ) : postsError ? (
+                    <p className="profile-error">{postsError}</p>
+                ) : posts.length === 0 ? (
+                    <p>No posts yet.</p>
+                ) : (
+                    <div className="profile-posts-list">
+                        {posts.map((post) => (
+                            <article
+                                className="profile-post-card"
+                                key={post._id}
+                                onClick={() => navigate(`/posts/${post._id}`)}
+                            >
+                                <p>{post.content}</p>
+
+                                {post.image && (
+                                    <img
+                                        src={post.image}
+                                        alt="Post"
+                                        className="profile-post-image"
+                                    />
+                                )}
+
+                                <div className="profile-post-stats">
+                                    <span>
+                                        {post.likes?.length || 0} likes
+                                    </span>
+                                    <span>
+                                        {post.comments?.length || 0} comments
+                                    </span>
+                                </div>
+                            </article>
+                        ))}
+                    </div>
+                )}
+            </section>
         </>
     );
 }

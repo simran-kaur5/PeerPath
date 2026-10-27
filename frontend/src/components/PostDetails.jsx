@@ -143,6 +143,16 @@ export default function ViewFullPost({id}) {
                         )}
                     </div>
 
+                    <div className="post-details-stats">
+                        <span>
+                            {post.likes?.length || 0} likes
+                        </span>
+
+                        <span>
+                            {post.comments?.length || 0} comments
+                        </span>
+                    </div>
+
                 </div>
             </div>
         </div>

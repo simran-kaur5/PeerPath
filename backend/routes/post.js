@@ -12,7 +12,7 @@ const upload = multer({ storage });
 
 const router = express.Router()
 
-router.post("/",isLoggedIn,validateBody,validatePost,upload.single("image"),async(req,res)=>{
+router.post("/",isLoggedIn,validatePost,upload.single("image"),async(req,res)=>{
     try{
         const {content} = req.body;
 
