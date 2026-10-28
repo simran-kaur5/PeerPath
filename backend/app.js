@@ -13,6 +13,9 @@ import connection from "./routes/connection.js"
 import notifications from "./routes/notifications.js"
 
 const app = express()
+app.set("trust proxy", 1);
+
+dotenv.config();
 
 dotenv.config();
 
