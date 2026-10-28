@@ -17,7 +17,6 @@ app.set("trust proxy", 1);
 
 dotenv.config();
 
-dotenv.config();
 
 const sessionOptions = {
     secret: process.env.SESSION_SECRET,
@@ -31,8 +30,8 @@ const sessionOptions = {
     cookie: {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: "none",
-        secure: true
+        sameSite: "lax",
+        secure: process.env.NODE_ENV === "production"
     }
 }
 
