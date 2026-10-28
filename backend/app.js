@@ -28,13 +28,18 @@ const sessionOptions = {
     cookie: {
         maxAge: 7 * 24 * 60 * 60 * 1000,
         httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production"
+        sameSite: "none",
+        secure: true
     }
 }
 
+const allowedOrigins = [
+    "http://localhost:5173",
+    "https://peerpath-1.onrender.com"
+];
+
 app.use(cors({
-    origin: "http://localhost:5173",
+    origin: allowedOrigins,
     credentials: true
 }));
 
