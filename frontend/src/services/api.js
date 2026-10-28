@@ -1,22 +1,24 @@
 import axios from "axios";
 
+const BASE_URL = "https://peerpath-26mg.onrender.com";
+
 const postAPI = axios.create({
-    baseURL: "http://localhost:5000/posts",
+    baseURL: `${BASE_URL}/posts`,
     withCredentials: true
 })
 
 const userAPI = axios.create({
-    baseURL: "http://localhost:5000/users",
+    baseURL: `${BASE_URL}/users`,
     withCredentials: true
 });
 
 const connectionAPI = axios.create({
-    baseURL : "http://localhost:5000/connections",
+    baseURL : `${BASE_URL}/connections`,
     withCredentials: true
 })
 
 const notificationAPI = axios.create({
-    baseURL: "http://localhost:5000/notifications",
+    baseURL: `${BASE_URL}/notifications`,
     withCredentials: true
 })
 
