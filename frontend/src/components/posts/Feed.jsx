@@ -2,7 +2,7 @@ import "./Feed.css";
 import { useState } from "react";
 import { useEffect } from "react";
 import Navbar from "../navigation/Navbar";
-import CreatePost from "./CreatePost";
+import CreatePost from "./CreatePost.jsx";
 import SuggestedConnections from "../connections/SuggestedConnections";
 import { ThumbsUp,ChevronUp, ChevronDown, CornerDownLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
