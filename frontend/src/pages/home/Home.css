@@ -1,0 +1,185 @@
+
+.Home {
+    width: 100%;
+    min-width: 0;
+    overflow-x: hidden;
+    box-sizing: border-box;
+}
+
+.tags {
+    padding: 5px clamp(20px, 8vw, 120px);
+    min-width: 0;
+}
+
+.tag {
+    font-size: clamp(2rem, 5vw, 4rem);
+    line-height: 1.15;
+    overflow-wrap: anywhere;
+}
+
+.login {
+    margin-top: 3rem;
+    font-size: 1.2rem;
+    border: 0;
+    background-color: #0A66C2;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 3rem;
+    cursor: pointer;
+    max-width: 100%;
+}
+
+.login:hover {
+    background-color: #004182;
+}
+
+.mailIcon {
+    margin-left: 1rem;
+}
+
+.homeContent {
+    margin-top: 4.2rem;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+}
+
+.image-container {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    flex: 1;
+    min-width: 0;
+}
+
+.image-container img {
+    display: block;
+    width: 100%;
+    max-width: 50rem;
+    height: auto;
+    max-height: 42rem;
+    object-fit: contain;
+}
+.signup-prompt {
+    margin-top: 16px;
+    text-align: center;
+    color: #555;
+    font-size: 16px;
+}
+
+.signup-link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: #0a66c2;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.signup-link:hover {
+    text-decoration: underline;
+}
+.feed-prompt {
+    margin-top: 14px;
+    color: #555;
+    font-size: 18px;
+}
+
+.feed-link {
+    padding: 0;
+    border: none;
+    background: none;
+    color: #0a66c2;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.feed-link:hover {
+    text-decoration: underline;
+}
+
+/* Tablets */
+@media (max-width: 900px) {
+    .tags {
+        padding: 5px 32px;
+    }
+
+    .homeContent {
+        margin-top: 3rem;
+        gap: 16px;
+    }
+
+    .login {
+        margin-top: 2rem;
+    }
+}
+
+/* Mobile phones */
+@media (max-width: 600px) {
+    .tags {
+        padding: 12px 20px;
+    }
+
+    .tag {
+        font-size: clamp(2rem, 8vw, 3rem);
+        line-height: 1.2;
+    }
+
+    .homeContent {
+        flex-direction: column;
+        align-items: stretch;
+        margin-top: 1.5rem;
+        gap: 20px;
+    }
+
+    .image-container {
+        width: 100%;
+        justify-content: center;
+    }
+
+    .image-container img {
+        width: 100%;
+        max-width: 32rem;
+        max-height: 25rem;
+    }
+
+    .login {
+        margin-top: 1.5rem;
+        font-size: 1rem;
+        padding: 10px 20px;
+    }
+
+    .mailIcon {
+        margin-left: 0.5rem;
+    }
+}
+
+/* Small phones */
+@media (max-width: 360px) {
+    .tags {
+        padding: 10px 14px;
+    }
+
+    .tag {
+        font-size: 1.9rem;
+    }
+
+    .homeContent {
+        margin-top: 1rem;
+        gap: 14px;
+    }
+
+    .image-container img {
+        max-height: 20rem;
+    }
+
+    .login {
+        font-size: 0.95rem;
+        padding: 9px 16px;
+    }
+}

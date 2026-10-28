@@ -1,0 +1,132 @@
+.edit-profile-page {
+  min-height: 100vh;
+  background: #f3f2ef;
+}
+
+.edit-profile-container {
+  max-width: 750px;
+  margin: 30px auto;
+  padding: 0 20px 40px;
+}
+
+.edit-profile-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 32px;
+}
+
+.edit-profile-card h1 {
+  margin: 0 0 8px;
+  color: #191919;
+  font-size: 28px;
+}
+
+.edit-subtitle {
+  margin: 0 0 26px;
+  color: #666;
+  line-height: 1.5;
+}
+
+.edit-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.edit-profile-form label {
+  margin-top: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+}
+
+.edit-profile-form input,
+.edit-profile-form textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 12px;
+  border: 1px solid #bbb;
+  border-radius: 6px;
+  font: inherit;
+  color: #191919;
+  background: #fff;
+  outline: none;
+}
+
+.edit-profile-form input:focus,
+.edit-profile-form textarea:focus {
+  border-color: #0a66c2;
+  box-shadow: 0 0 0 2px rgba(10, 102, 194, 0.12);
+}
+
+.edit-profile-form textarea {
+  resize: vertical;
+}
+
+.edit-hint {
+  margin: -4px 0 4px;
+  color: #777;
+  font-size: 12px;
+}
+
+.edit-error {
+  color: #c62828;
+  margin: 8px 0;
+}
+
+.edit-success {
+  color: #218739;
+  margin: 8px 0;
+}
+
+.edit-profile-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 22px;
+}
+
+.edit-loading {
+  text-align: center;
+  margin-top: 40px;
+  color: #555;
+}
+
+@media (max-width: 600px) {
+  .edit-profile-container {
+    margin-top: 18px;
+    padding: 0 12px 24px;
+  }
+
+  .edit-profile-card {
+    padding: 22px 18px;
+  }
+
+  .edit-profile-card h1 {
+    font-size: 24px;
+  }
+
+  .edit-profile-actions {
+    flex-wrap: wrap;
+  }
+
+  .edit-profile-actions button {
+    flex: 1;
+    min-width: 100px;
+  }
+}
+
+@media (max-width: 360px) {
+  .edit-profile-card {
+    padding: 18px 14px;
+  }
+
+  .edit-profile-actions {
+    flex-direction: column-reverse;
+  }
+
+  .edit-profile-actions button {
+    width: 100%;
+  }
+}

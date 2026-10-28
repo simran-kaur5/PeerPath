@@ -1,19 +1,24 @@
-import "./App.css";
-import Login from "./pages/Login";
-import SignUp from "./pages/SignUp";
-import Feed from "./components/Feed";
-import NotFound from "./components/NotFound";
-import { Routes, Route, useParams } from "react-router-dom";
-import EditPost from "./pages/EditPost";
-import PostDetails from "./components/PostDetails";
-import Delete from "./pages/Delete";
-import Profile from "./pages/Profile";
-import EditProfile from "./pages/EditProfile";
-import People from "./components/People";
-import PublicView from "./pages/PublicView";
-import ConnectionRequests from "./components/ConnectionRequests";
-import MyConnections from "./components/MyConnections";
-import Notification from "./components/Notification";
+import "./styles/App.css";
+import { Routes, Route, useParams,Navigate  } from "react-router-dom";
+
+// Pages
+import Home from "./pages/home/Home.jsx";
+import Login from "./pages/auth/Login";
+import SignUp from "./pages/auth/SignUp";
+import EditPost from "./pages/posts/EditPost";
+import Delete from "./pages/posts/Delete.jsx";
+import Profile from "./pages/profile/Profile";
+import EditProfile from "./pages/profile/EditProfile";
+import PublicView from "./pages/profile/PublicView";
+
+// Components
+import Feed from "./components/posts/Feed";
+import PostDetails from "./components/posts/PostDetails";
+import NotFound from "./components/shared/NotFound";
+import People from "./components/people/People";
+import ConnectionRequests from "./components/connections/ConnectionRequests";
+import MyConnections from "./components/connections/MyConnections";
+import Notification from "./components/notifications/Notification";
 
 function EditPostPage() {
     const { id } = useParams();
@@ -33,7 +38,10 @@ function PostDetailsPage() {
 function App() {
     return (
         <Routes>
-            <Route path="/" element={<Feed />} />
+            <Route path="/" element={sessionStorage.getItem("isLogin") === "true"
+            ? <Navigate to="/feed" replace />
+            : <Home />} />
+            <Route path="/feed" element={<Feed />} />
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
 

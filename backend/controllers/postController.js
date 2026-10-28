@@ -1,0 +1,297 @@
+import Post from "../models/Post.js";
+import Notification from "../models/Notification.js";
+import mongoose from "mongoose";
+import { StatusCodes } from "http-status-codes";
+
+export const createPost = async(req, res)=>{
+    try{
+        const {content} = req.body;
+
+        if(!content || !content.trim()){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message:"Post content is required"
+            })
+        }
+
+        const newPost = await Post.create({
+            content,
+            image: req.file? req.file.path:"",
+            author: req.user._id
+        })
+
+        await newPost.populate(
+            "author",
+            "username name profilePicture"
+        );
+        console.log(newPost)
+
+        res.status(StatusCodes.CREATED).json({
+            message:"Post created sucessfully",
+            post: newPost
+        })
+    }catch(error){
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message:"Failed to create post",
+            error:error.message
+        })
+    }
+}
+
+export const getPosts = async(req,res)=>{
+    try{
+        let posts = await Post.find().populate("author","username name profilePicture")
+                                    .populate("comments.author", "username name profilePicture")
+                                    .sort({createdAt:-1})
+
+        res.status(StatusCodes.OK).json(posts)
+    }catch(error){
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message:"Failed to fetch posts",
+            error:error.message
+        })
+    }
+}
+
+export const toggleLike  = async(req,res)=>{
+    try{
+        const {id} = req.params
+
+        if(!mongoose.isValidObjectId(id)){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message: "Invalid post ID"
+            })
+        }
+
+        const post = await Post.findById(id)
+
+        if(!post){
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message: "Post not found"
+            })
+        }
+
+        const userId = req.user._id
+        const alreadyLiked = post.likes.some(//at least one id
+            (likedUserId)=> likedUserId.toString() === userId.toString()
+        )
+
+        if(alreadyLiked){
+            post.likes.pull(userId)
+        }else{
+            post.likes.addToSet(userId)
+        }
+
+        await post.save()
+
+        if(!alreadyLiked && post.author.toString() !== userId.toString()){
+            const notificaton = await Notification.create({
+                recipient: post.author,
+                sender: userId,
+                type: "like",
+                post: post._id,
+                message: `${req.user.name || "Someone"} liked you post`
+            })
+        }
+
+        return res.status(StatusCodes.OK).json({
+            message: alreadyLiked? "Post unliked": "Post liked",
+            likes: post.likes,
+            likeCount: post.likes.length,
+            isLiked: !alreadyLiked
+        })
+    }catch (error) {
+        console.error("Like action failed:", error);
+
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Failed to like or unlike post"
+        })
+    }
+}
+
+export const addComment = async(req,res)=>{
+    try{
+        const {id} = req.params
+        const {text} = req.body
+
+        if(!mongoose.isValidObjectId(id)){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message: "Invalid post ID"
+            })
+        }
+
+        if(!text || !text.trim()){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message: "Comment cannot be empty"
+            })
+        }
+
+        const post = await Post.findById(id)
+        if(!post){
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message: "Post not found"
+            }) 
+        }
+
+        post.comments.push({
+            text: text.trim(),
+            author: req.user._id
+        })
+
+        await post.save()
+
+        // Notify the post author only if another user comments
+        if (post.author.toString() !== req.user._id.toString()) {
+            await Notification.create({
+                recipient: post.author,
+                sender: req.user._id,
+                type: "comment",
+                post:post._id,
+                message: `${req.user.name || "Someone"} commented on your post`
+            })
+        }
+
+        await post.populate("comments.author","username name profilePicture")
+
+        return res.status(StatusCodes.CREATED).json({
+            message: "Comment added",
+            comments: post.comments
+        })
+    }catch (error) {
+        console.error("Failed to add comment:", error);
+
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Failed to add comment"
+        });
+    }
+}
+
+export const deleteComment = async(req,res)=>{
+    try{
+        const {id, commentId} = req.params
+
+        if(!mongoose.isValidObjectId(id) || !mongoose.isValidObjectId(commentId)){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message : "Invalid post or comment ID"
+            })
+        }
+
+        const post = await Post.findById(id)
+
+        if(!post){
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message: "Post not found"
+            })
+        }
+
+        const comment = post.comments.id(commentId)
+
+        if(!comment){
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message: "Comment not found"
+            })
+        }
+
+        if(String(comment.author) !== String(req.user._id)){
+            return res.status(StatusCodes.FORBIDDEN).json({
+                message: "you can only delete your own comments"
+            })
+        }
+
+        comment.deleteOne()
+        await post.save()
+
+        res.status(StatusCodes.OK).json({
+            message : "Comment deleted sucessfully",
+            comments: post.comments
+        })
+    }catch(error){
+        console.error("Delete comment error",error)
+
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Failed to delete comment"
+        })
+    }
+}
+
+export const getPost = async(req,res)=>{
+    try{
+        let id = req.params.id;
+        
+        const post = await Post.findById(id).populate("author","username")
+
+        if(!post){
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message:"Post not found"
+            })
+        }
+
+        return res.json(post);
+    }catch(error){
+        res.status(StatusCodes.BAD_REQUEST).json({
+            message:"Invalid post ID" 
+        })
+    }
+}
+
+export const updatePost = async(req,res)=>{
+    try{
+        const {id} = req.params
+
+        if(!mongoose.isValidObjectId(id)){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message:"Invalid post ID"
+            });
+        }
+
+        const { content } = req.body;
+        const updateData = {content}
+
+        if(req.file){
+            updateData.image = req.file.path;
+        }                
+
+
+        const updatedPost = await Post.findByIdAndUpdate(
+            id,
+            updateData,
+            {new:true, runValidators:true}
+        );
+        
+        if(!updatedPost){
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message:"Post not Found"
+            })
+        }
+
+        res.status(StatusCodes.OK).json({
+            message:"Updated post",
+            post:updatedPost
+        })
+    }catch(error){
+        res.status(StatusCodes.BAD_REQUEST).json({
+            message:"Failed to update post"
+        })
+    }
+}
+
+export const deletePost = async(req,res)=>{
+    try{
+        let id = req.params.id
+        let post = await Post.findByIdAndDelete(id)
+
+        if(!post){
+            return res.status(StatusCodes.NOT_FOUND).json({
+                message:"Post not found"
+            })
+        }
+
+        return res.status(StatusCodes.OK).json({
+            message:"Post is deleted"
+        })
+
+    }catch(error){
+        return res.status(StatusCodes.BAD_REQUEST).json({
+            message:"Error occured"
+        })
+    }
+}
