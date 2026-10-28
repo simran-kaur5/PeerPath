@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Avatar, Button, TextField } from "@mui/material";
 import { Image, Video, CalendarDays } from "lucide-react";
-import "./createPost.css";
+import "./CreatePost.css";
 import { postAPI } from "../../services/api.js";
 import { useNavigate } from "react-router-dom";
 
