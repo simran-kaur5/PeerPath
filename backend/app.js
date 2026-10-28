@@ -17,21 +17,27 @@ app.set("trust proxy", 1);
 
 dotenv.config();
 
+const store = MongoStore.create({
+    mongoUrl: dbUrl,
+    crypto:{
+        secret:process.env.SECRET
+    },
+    touchAfter:24*3600
+})
+
+store.on("error",()=>{
+    console.log("Error in store")
+})
 
 const sessionOptions = {
     secret: process.env.SESSION_SECRET,
     resave: false,
-    saveUninitialized: false,
-    store: MongoStore.create({
-        mongoUrl: process.env.MONGODB_URL,
-        collectionName: "sessions",
-        ttl: 7 * 24 * 60 * 60
-    }),
+    saveUninitialized: true,
+    store,
     cookie: {
-        maxAge: 7 * 24 * 60 * 60 * 1000,
-        httpOnly: true,
-        sameSite: "lax",
-        secure: process.env.NODE_ENV === "production"
+        expires : Date.now() + 7*24*60*60*1000,
+        maxAge : 7*24*60*60*1000,
+        httpOnly:true
     }
 }
 
