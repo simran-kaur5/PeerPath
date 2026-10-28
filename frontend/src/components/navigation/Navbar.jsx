@@ -33,7 +33,7 @@ export default function Navbar(){
         };
 
         checkLogin();
-    }, [isLogin]);
+    },);
 
     useEffect(() => {
         if (!isLogin) {

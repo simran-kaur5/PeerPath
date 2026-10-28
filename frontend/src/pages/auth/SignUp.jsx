@@ -33,7 +33,7 @@ export default function SignUp() {
     try{
       await userAPI.post("/register",formData)
       sessionStorage.setItem("isLogin","true")
-      navigate("/login")
+      navigate("/feed")
     }catch(error){
       setError(error.response?.data?.message || "Registration failed..")
     }finally{

@@ -26,7 +26,7 @@ export default function Login() {
         {withCredentials:true}
       )
       sessionStorage.setItem("isLogin", "true");
-      navigate("/feed")
+      navigate("/feed");
     }catch(error){
       setError(error.response?.data?.message || "Login failed. Please try again.")
     }finally{
