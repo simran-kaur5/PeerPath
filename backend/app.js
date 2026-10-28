@@ -16,6 +16,8 @@ const app = express()
 dotenv.config();
 
 const dbUrl = process.env.MONGODB_URL
+const isProduction = process.env.NODE_ENV === "production";
+app.set("trust proxy", 1);
 
 const store = MongoStore.create({
     mongoUrl: dbUrl,
@@ -37,7 +39,9 @@ const sessionOptions = {
     cookie: {
         expires : Date.now() + 7*24*60*60*1000,
         maxAge : 7*24*60*60*1000,
-        httpOnly:true
+        httpOnly:true,
+        sameSite: isProduction ? "none" : "lax",
+        secure: isProduction
     }
 }
 
