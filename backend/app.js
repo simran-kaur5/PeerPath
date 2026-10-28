@@ -13,9 +13,9 @@ import connection from "./routes/connection.js"
 import notifications from "./routes/notifications.js"
 
 const app = express()
-app.set("trust proxy", 1);
-
 dotenv.config();
+
+const dbUrl = process.env.MONGODB_URL
 
 const store = MongoStore.create({
     mongoUrl: dbUrl,
@@ -30,7 +30,7 @@ store.on("error",()=>{
 })
 
 const sessionOptions = {
-    secret: process.env.SESSION_SECRET,
+    secret: process.env.SECRET,
     resave: false,
     saveUninitialized: true,
     store,
