@@ -123,13 +123,17 @@ export const registerUser = async(req, res, next)=>{
                 return next(err)
             }
 
-            return res.status(StatusCodes.CREATED).json({
-                message:"Registered sucessfully",
-                user:{
-                    id: registeredUser._id,
-                    username: registeredUser.username
-                }
+            req.session.save((saveErr) => {
+                if (saveErr) return next(saveErr);
+
+                return res.status(StatusCodes.CREATED).json({
+                    message: "Registered successfully",
+                    user: {
+                        id: registeredUser._id,
+                        username: registeredUser.username
+                    }
             })
+        });
         })
     }catch(error){
         if( error.name === "UserExistsError" ||
@@ -163,13 +167,17 @@ export const loginUser = (req,res,next)=>{
         req.login(user, (err) => {
             if (err) return next(err);
 
-            res.json({
-                message: "Login successful",
-                user: {
-                    id: user._id,
-                    username: user.username
-                }
-            });
+            req.session.save((saveErr) => {
+                if (saveErr) return next(saveErr);
+
+                return res.status(StatusCodes.OK).json({
+                    message: "Login successful",
+                    user: {
+                        id: user._id,
+                        username: user.username
+                    }
+                });
+            })
         });
     })(req, res, next);
 }
