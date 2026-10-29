@@ -19,17 +19,12 @@ export const validatePost = (req,res,next)=>{
 }
 
 export const isLoggedIn = (req,res,next)=>{
-    console.log("Authenticated:", req.isAuthenticated());
-    console.log("Session ID:", req.sessionID);
-    console.log("User:", req.user?._id);
     if(!req.isAuthenticated()){
         
         return res.status(StatusCodes.UNAUTHORIZED).json({
             message:"Please log in"
         })
     }
-
-    console.log(req.user)
     next()
 }
 
