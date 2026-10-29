@@ -27,9 +27,9 @@ const store = MongoStore.create({
     touchAfter:24*3600
 })
 
-store.on("error",()=>{
-    console.log("Error in store")
-})
+store.on("error", (error) => {
+    console.error("Session store error:", error);
+});
 
 const sessionOptions = {
     secret: process.env.SECRET,
@@ -51,8 +51,16 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-    origin: allowedOrigins,
-    credentials: true
+    origin: function (origin, callback) {
+        if (!origin || allowedOrigins.includes(origin)) {
+            callback(null, true);
+        } else {
+            callback(new Error("Not allowed by CORS"));
+        }
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "PATCH", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization", "Cookie"]
 }));
 
 app.use(express.json())
