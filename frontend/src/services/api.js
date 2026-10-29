@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const BASE_URL = "https://peerpath-26mg.onrender.com";
+const BASE_URL =
+    import.meta.env.VITE_API_URL || "http://localhost:5000";
 
 const postAPI = axios.create({
     baseURL: `${BASE_URL}/posts`,
@@ -21,5 +22,7 @@ const notificationAPI = axios.create({
     baseURL: `${BASE_URL}/notifications`,
     withCredentials: true
 })
+
+// console.log("API URL:", BASE_URL);
 
 export { postAPI,userAPI, connectionAPI,notificationAPI};

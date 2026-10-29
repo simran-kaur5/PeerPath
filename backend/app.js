@@ -34,14 +34,13 @@ store.on("error", (error) => {
 const sessionOptions = {
     secret: process.env.SECRET,
     resave: false,
-    saveUninitialized: true,
+    saveUninitialized: false,
     store,
     cookie: {
-        expires : Date.now() + 7*24*60*60*1000,
-        maxAge : 7*24*60*60*1000,
-        httpOnly:true,
-        sameSite: isProduction ? "none" : "lax",
-        secure: isProduction
+    maxAge: 7 * 24 * 60 * 60 * 1000,
+    httpOnly: true,
+    sameSite: "lax",
+    secure: process.env.NODE_ENV === "production"
     }
 }
 
