@@ -39,8 +39,8 @@ const sessionOptions = {
     cookie: {
     maxAge: 7 * 24 * 60 * 60 * 1000,
     httpOnly: true,
-    sameSite: "lax",
-    secure: process.env.NODE_ENV === "production"
+    sameSite: isProduction ? "none" : "lax",
+    secure: isProduction
     }
 }
 
