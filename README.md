@@ -11,12 +11,13 @@ Explore the live application and try its features.
 ## Features
 
 - **User Authentication** — Register, log in, and log out securely.
-- **Profile Management** — Create and update your professional profile.
+- **Profile Management** —  Create and update professional profiles with        personal information, skills, education, and website details.  
 - **Posts and Feed** — Create posts and browse content shared by other users.
 - **Likes** — Like and unlike posts.
 - **Comments** — Add comments to posts and delete your own comments.
 - **People Discovery** — Explore users and discover professionals.
-- **Connections** — Connect with other users.
+- **Connection Management** — Send connection requests and check connection status.
+- **Connection Status** — View whether a user is not connected, has a pending sent request, has sent an incoming request, or is already connected.
 - **Notifications** — Stay informed about relevant activity.
 - **Profile Pictures and Image Uploads** — Personalize your profile and share images.
 
