@@ -257,3 +257,37 @@ export const getPublicUser = async(req,res)=>{
         })
     }
 }
+
+export const searchUsers = async(req,res)=>{
+    try{
+        const searchTerm = req.query.q?.trim()
+
+        if(!searchTerm){
+            return res.status(StatusCodes.OK).json({
+                users: []
+            })
+        }
+
+        const escapedTerm = searchTerm.replace(
+            /[.*+?^${}()|[\]\\]/g,
+            "\\$&"
+        )
+
+        const users = await User.find({
+            _id: {$ne : req.user._id},
+            username:{
+                $regex: escapedTerm,
+                $options: "i"
+            }
+        }).select("username name headline location profilePicture")
+          .limit(10)
+
+        return res.status(StatusCodes.OK).json({ users });
+    }catch (error) {
+        console.error("Search users failed:", error);
+
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Unable to search users"
+        });
+    }
+}

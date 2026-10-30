@@ -11,8 +11,13 @@ export default function People(){
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState("")
-    const [requestingId, setRequestingId] = useState("")
-    const [sentRequests,setSentRequests ] = useState([])
+    const [connectionStatuses, setConnectionStatuses] = useState({});
+    const [requestingId, setRequestingId] = useState("");
+
+    const [searchTerm, setSearchTerm] = useState("");
+    const [searchResults, setSearchResults] = useState([]);
+    const [searchLoading, setSearchLoading] = useState(false);
+    const [searchError, setSearchError] = useState("");
     
     const navigate = useNavigate();
 
@@ -31,23 +36,7 @@ export default function People(){
         }
 
         fetchUsers();
-        fetchSentRequests();
     },[])
-
-    const fetchSentRequests = async () => {
-        try{
-            const response = await connectionAPI.get("/sent");
-
-            const sentIds = response.data.requests.map(
-                (request) => request.receiver._id
-            )
-
-            setSentRequests(sentIds)
-            console.log(sentIds)
-        }catch (error) {
-            console.error("Failed to fetch sent requests:", error);
-        }
-    }
     
     const handleConnect = async (e, personId)=>{
         e.stopPropagation()
@@ -60,7 +49,10 @@ export default function People(){
                 receiverId: personId
             })
 
-            setSentRequests((prev) => [...prev, personId]);
+            setConnectionStatuses((prev) => ({
+                ...prev,
+                [personId]: "pending_sent"
+            }));
         }catch(error){
             console.error("Failed to send Connection req")
 
@@ -70,6 +62,104 @@ export default function People(){
             setRequestingId("")
         }
     }
+
+    //search when user pauses typing
+    useEffect(()=>{
+        const term = searchTerm.trim()
+
+        if(term.length< 2){
+            setSearchResults([])
+            setSearchLoading(false)
+            setSearchError("")
+            return;
+        }
+
+        let cancelled = false
+
+        const timer = setTimeout(async ()=>{
+            setSearchError("")
+            setSearchLoading(true)
+
+            try{
+                const response = await userAPI.get("/search", {
+                    params: {q: term}
+                })
+
+                if(!cancelled){
+                    setSearchResults(response.data.users || [])
+                }
+            }catch(error){
+                if(!cancelled){
+                    setSearchResults([]);
+                    setSearchError(
+                        error.response?.data?.message ||
+                        "Unable to search users."
+                    );
+                }
+            }finally {
+                if (!cancelled) {
+                    setSearchLoading(false);
+                }
+            }
+        }, 300)
+
+        return () => {
+            cancelled = true;
+            clearTimeout(timer);
+        };
+
+    }, [searchTerm])
+    const displayedUsers = searchTerm.trim().length >= 2
+    ? searchResults
+    : users;
+
+    useEffect(() => {
+        let active = true
+
+        const fetchConnectionStatus = async () =>{
+            if(displayedUsers.length === 0) return
+            try{
+                const results = await Promise.all(
+                    displayedUsers.map(async (person)=>{
+                        try{
+                            const response = await connectionAPI.get(`/status/${person._id}`)
+
+                            return {
+                                id: person._id,
+                                status: response.data.status
+                            }
+                        }catch(error){
+                            console.log("Failed to check status",error)
+                            return {
+                                id: person._id,
+                                status: "unknown"
+                            };
+                        }
+                    })
+                )
+
+                if(!active) return;
+
+                setConnectionStatuses(prev => {
+                    const updated = {...prev}
+
+                    results.forEach(({ id, status }) => {
+                        updated[id] = status;
+                    });
+
+                    return updated;
+                })
+            }catch (error) {
+                console.error("Unable to fetch connection statuses:", error);
+            }
+        };
+
+        fetchConnectionStatus();
+
+        return()=>{
+            active = false
+        }
+    }, [displayedUsers])
     
     return (
     <div className="people-page">
@@ -77,72 +167,122 @@ export default function People(){
 
         <main className="people-container">
             <h1>Discover People</h1>
+
             <p className="people-subtitle">
                 Find people and grow your professional network.
             </p>
 
-            {error && <p className="people-error">{error}</p>}
-            
+            {/* Search bar */}
+            <div className="people-search">
+                <input
+                    type="text"
+                    placeholder="Search people by username..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                />
+            </div>
+
+            {/* General errors */}
+            {error && (
+                <p className="people-error">{error}</p>
+            )}
+
+            {/* Search status */}
+            {searchLoading && <p>Searching...</p>}
+
+            {searchError && (
+                <p className="people-error">{searchError}</p>
+            )}
+
             {loading ? (
                 <p>Loading people...</p>
-            ) : error ? (
-                <p className="people-error">{error}</p>
-            ) : users.length === 0 ? (
-                <p>No other users found yet.</p>
             ) : (
-                <div className="people-grid">
-                    {users.map((person) => (
-                        <article
-                            className="person-card"
-                            key={person._id}
-                            onClick={()=> navigate(`/people/${person._id}`)}
-                            style={{ cursor: "pointer" }}
-                        >
-                            <div className="person-avatar">
-                                {person.profilePicture ? (
-                                    <img
-                                        src={person.profilePicture}
-                                        alt={person.name || person.username}
-                                    />
-                                ) : (
-                                    <UserRound size={42} />
-                                )}
-                            </div>
+                <>
+                    {searchTerm.trim().length >= 2 && (
+                        <h2>Search Results</h2>
+                    )}
 
-                            <h2>{person.name || person.username}</h2>
+                    {displayedUsers.length === 0 ? (
+                        <p>
+                            {searchTerm.trim().length >= 2
+                                ? searchLoading
+                                    ? "Searching for people..."
+                                    : "No matching users found."
+                                : "No other users found yet."}
+                        </p>
+                    ) : (
+                        <div className="people-grid">
+                            {displayedUsers.map((person) => (
+                                <article
+                                    className="person-card"
+                                    key={person._id}
+                                    onClick={() =>
+                                        navigate(`/people/${person._id}`)
+                                    }
+                                    style={{ cursor: "pointer" }}
+                                >
+                                    <div className="person-avatar">
+                                        {person.profilePicture ? (
+                                            <img
+                                                src={person.profilePicture}
+                                                alt={
+                                                    person.name ||
+                                                    person.username
+                                                }
+                                            />
+                                        ) : (
+                                            <UserRound size={42} />
+                                        )}
+                                    </div>
 
-                            <p className="person-headline">
-                                {person.headline || "Professional member"}
-                            </p>
+                                    <h2>
+                                        {person.name || person.username}
+                                    </h2>
 
-                            {person.location && (
-                                <p className="person-location">
-                                    <MapPin size={15} />
-                                    {person.location}
-                                </p>
-                            )}
+                                    <p className="person-headline">
+                                        {person.headline ||
+                                            "Professional member"}
+                                    </p>
 
-                            <Button
-                                variant = "contained"
-                                disabled = {
-                                    requestingId === person._id || sentRequests.includes(person._id)
-                                }
-                                onClick={(e) =>
-                                    handleConnect(e, person._id)
-                                }
-                            >
-                                {requestingId === person._id
-                                    ? "Sending..."
-                                    : sentRequests.includes(person._id)
-                                    ? "Request Sent"
-                                    : "Connect"}
-                            </Button>
-                        </article>
-                    ))}
-                </div>
+                                    {person.location && (
+                                        <p className="person-location">
+                                            <MapPin size={15} />
+                                            {person.location}
+                                        </p>
+                                    )}
+
+                                    <Button
+                                        variant={
+                                            connectionStatuses[person._id] === "none"
+                                                ? "contained"
+                                                : "outlined"
+                                        }
+                                        disabled={
+                                            requestingId === person._id ||
+                                            !connectionStatuses[person._id] ||
+                                            connectionStatuses[person._id] === "unknown" ||
+                                            connectionStatuses[person._id] !== "none"
+                                        }
+                                        onClick={(e) => handleConnect(e, person._id)}
+                                    >
+                                        {requestingId === person._id
+                                            ? "Sending..."
+                                            : connectionStatuses[person._id] === "none"
+                                                ? "Connect"
+                                                : connectionStatuses[person._id] === "pending_sent"
+                                                    ? "Request Sent"
+                                                    : connectionStatuses[person._id] === "pending_received"
+                                                        ? "Respond to Request"
+                                                        : connectionStatuses[person._id] === "connected"
+                                                            ? "Connected"
+                                                            : "Checking..."}
+                                    </Button>
+                                </article>
+                            ))}
+                        </div>
+                    )}
+                </>
             )}
         </main>
     </div>
-);
-
-}
+);}

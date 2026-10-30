@@ -1,4 +1,4 @@
-import { Users, UserRound, Bell } from 'lucide-react';
+import { Users, UserRound, Bell, Search } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import "./Navbar.css"
 import { Link, useNavigate } from "react-router-dom";
@@ -9,6 +9,7 @@ export default function Navbar(){
     let [isLogin,setisLogin] = useState(false);
     const [profilePicture, setProfilePicture] = useState("");
     const [unreadCount, setUnreadCount] = useState(0);
+
 
     const navigate = useNavigate();
 
@@ -52,6 +53,8 @@ export default function Navbar(){
 
         fetchUnreadCount();
     }, [isLogin]);
+
+    
     
     const handleLogout = async ()=>{
         try{
@@ -63,6 +66,7 @@ export default function Navbar(){
             console.log("Logout failed",error)
         }
     }
+
 
     return (
         <div className='Navbar'>

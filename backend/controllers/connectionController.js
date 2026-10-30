@@ -235,3 +235,68 @@ export const rejectConnectionRequest = async(req,res)=>{
         })
     }
 }
+
+export const getConnectionStatus = async (req,res)=>{
+    try{
+        const {userId} = req.params;
+        const currUserId = req.user._id
+
+        if(!mongoose.Types.ObjectId.isValid(userId)){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message: "Invalid user ID."
+            });
+        }
+
+        if(String(currUserId) === String(userId)){
+            return res.status(200).json({
+                status: "self",
+                requestId: null
+            });
+        }
+
+        const acceptConnection = await Connection.findOne({
+            status: "accepted",
+            $or: [
+                {sender: currUserId, receiver: userId},
+                {sender: userId, receiver: currUserId}
+            ]
+        })
+
+        if(acceptConnection){
+            return res.status(200).json({
+                status: "connected",
+                requestId: null
+            });
+        }
+
+        const pendingReq = await Connection.findOne({
+            status: "pending",
+            $or: [
+                { sender: currUserId, receiver: userId },
+                { sender: userId, receiver: currUserId }
+            ]
+        })
+
+        if(pendingReq){
+            const requestSentByMe = String(pendingReq.sender) === String(currUserId)
+
+            return res.status(StatusCodes.OK).json({
+                status: requestSentByMe
+                    ? "pending_sent"
+                    : "pending_received",
+                requestId: pendingReq._id
+            })
+        }
+
+        return res.status(200).json({
+            status: "none",
+            requestId: null
+        });
+    }catch (error) {
+        console.error("Get connection status error:", error);
+
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Unable to check connection status."
+        });
+    }
+}

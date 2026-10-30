@@ -7,7 +7,7 @@ import {
     Plus
 } from "lucide-react";
 import { Button } from "@mui/material";
-import { userAPI, postAPI } from "../../services/api";
+import { userAPI, postAPI,connectionAPI  } from "../../services/api";
 import { useEffect } from "react";
 import "./ProfileView.css";
 
@@ -17,6 +17,12 @@ export default function ProfileView({ user, isOwnProfile = false }) {
     const [posts, setPosts] = useState([]);
     const [postsLoading, setPostsLoading] = useState(true);
     const [postsError, setPostsError] = useState("");
+
+    const [connectionStatus, setConnectionStatus] = useState("none");
+    const [connectionRequestId, setConnectionRequestId] = useState(null);
+    const [connectionLoading, setConnectionLoading] = useState(true);
+    const [connectionActionLoading, setConnectionActionLoading] = useState(false);
+    const [connectionError, setConnectionError] = useState("");
 
     const [profilePicture, setProfilePicture] = useState(
         user?.profilePicture || ""
@@ -67,6 +73,68 @@ export default function ProfileView({ user, isOwnProfile = false }) {
         };  
     } ,[user?._id, user?.id])
 
+    useEffect(()=>{
+        if(isOwnProfile || !user?._id){
+            setConnectionStatus("none");
+            setConnectionRequestId(null);
+            setConnectionLoading(false);
+            setConnectionError("");
+            return;
+        }
+
+        let active = true;
+
+        const checkConnection = async () =>{
+            try{
+                setConnectionLoading(true);
+                setConnectionError("");
+                setConnectionStatus("none");
+                setConnectionRequestId(null);
+
+                const response = await connectionAPI.get(`/status/${user._id}`);
+
+                if (!active) return;
+
+                setConnectionStatus(response.data.status);
+                setConnectionRequestId(response.data.requestId || null);
+            }catch (error) {
+                console.error("Connection check failed:", error);
+                if (active) {
+                    setConnectionError("Unable to check connection status.");
+                }
+            } finally {
+                if (active) setConnectionLoading(false);
+            }
+        }
+
+        checkConnection()
+
+        return () =>{
+            active = false
+        }
+    },[user?._id, isOwnProfile])
+
+    const handleConnect = async () => {
+        try {
+            setConnectionActionLoading(true);
+            setConnectionError("");
+
+            await connectionAPI.post("/", {
+                receiverId: user._id
+            });
+
+            setConnectionStatus("pending_sent");
+
+        } catch (error) {
+            alert(
+                error.response?.data?.message ||
+                "Unable to send connection request."
+            );
+        } finally {
+            setConnectionActionLoading(false);
+        }
+    };
+
     if (!user) return null;
 
     const handleProfilePictureChange = async (e) => {
@@ -101,6 +169,41 @@ export default function ProfileView({ user, isOwnProfile = false }) {
     return (
         <>
             <div className="profile-header">
+                {!isOwnProfile && !connectionLoading && (
+    <>
+            {connectionStatus === "none" && (
+                <Button
+                    variant="contained"
+                    onClick={handleConnect}
+                    disabled={connectionActionLoading}
+                >
+                    {connectionActionLoading ? "Sending..." : "Connect"}
+                </Button>
+            )}
+
+            {connectionStatus === "pending_sent" && (
+                <Button variant="outlined" disabled>
+                    Request Sent
+                </Button>
+            )}
+
+            {connectionStatus === "pending_received" && (
+                <Button variant="outlined" disabled>
+                    Respond to Request
+                </Button>
+            )}
+
+            {connectionStatus === "connected" && (
+                <Button variant="outlined" disabled>
+                    Connected
+                </Button>
+            )}
+        </>
+    )}
+
+                {connectionError && (
+                    <p className="connection-error">{connectionError}</p>
+                )}
                 <div className="profile-avatar-wrapper">
                     <div className="profile-avatar">
                         {profilePicture ? (
@@ -160,6 +263,8 @@ export default function ProfileView({ user, isOwnProfile = false }) {
                         {user.location}
                     </p>
                 )}
+
+    
 
                 {isOwnProfile && (
                     <Button
