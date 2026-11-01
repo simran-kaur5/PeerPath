@@ -7,8 +7,6 @@ import os
 
 API_URL = f"{os.getenv('PEERPATH_API_URL', 'http://localhost:5000').rstrip('/')}/posts"
 
-print("MCP API URL:", API_URL)
-
 @mcp.tool()
 async def get_posts_by_author(author_name:str)-> list:
     "Get all PeerPath posts written by a particular author"
