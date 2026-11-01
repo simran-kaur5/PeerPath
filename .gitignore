@@ -22,3 +22,5 @@ yarn-debug.log*
 .vscode/
 
 .venv
+__pycache__/
+*.pyc
