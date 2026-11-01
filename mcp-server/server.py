@@ -72,7 +72,6 @@ async def get_recent_posts(limit: int =5)->list:
     limit = min(limit,50)
 
     async with httpx.AsyncClient(timeout=120.0) as client:
-        print("Fetching posts from:", API_URL, flush=True)
         response = await client.get(API_URL)
         response.raise_for_status()
 
