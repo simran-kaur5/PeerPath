@@ -19,6 +19,7 @@ import People from "./components/people/People";
 import ConnectionRequests from "./components/connections/ConnectionRequests";
 import MyConnections from "./components/connections/MyConnections";
 import Notification from "./components/notifications/Notification";
+import AIChat from "./components/AIChat/AIChat";
 
 function EditPostPage() {
     const { id } = useParams();
@@ -60,6 +61,8 @@ function App() {
 
             <Route path="/connections/requests" element={<ConnectionRequests />}/>
             <Route path="/notifications" element={<Notification/>} />
+            
+            <Route path="/ai-chat" element={<AIChat />} />
 
             <Route path="*" element={<NotFound />} />
         </Routes>
