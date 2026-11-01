@@ -7,6 +7,8 @@ import os
 
 API_URL = f"{os.getenv('PEERPATH_API_URL', 'http://localhost:5000').rstrip('/')}/posts"
 
+print("MCP API URL:", API_URL)
+
 @mcp.tool()
 async def get_posts_by_author(author_name:str)-> list:
     "Get all PeerPath posts written by a particular author"
@@ -70,6 +72,7 @@ async def get_recent_posts(limit: int =5)->list:
     limit = min(limit,50)
 
     async with httpx.AsyncClient() as client:
+        print("Fetching posts from:", API_URL, flush=True)
         response = await client.get(API_URL)
         response.raise_for_status()
 
@@ -98,6 +101,7 @@ async def get_trending_posts(limit: int =5)->list:
     limit = min(limit,50)
 
     async with httpx.AsyncClient() as client:
+        print("Fetching posts from:", API_URL, flush=True)
         response = await client.get(API_URL)
         response.raise_for_status()
 
