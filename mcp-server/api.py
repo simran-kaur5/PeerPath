@@ -7,16 +7,18 @@ import sys
 from services.conversation import get_conversation, save_conversation
 from services.assistant import get_assistant_response
 from fastapi.middleware.cors import CORSMiddleware
+import os
 
 from uuid import uuid4
 
 @asynccontextmanager # Manages asynchronous startup and shutdown.
 async def lifespan(app: FastAPI):
     server_path = Path(__file__).with_name("server.py")
-
+    print("FastAPI PEERPATH_API_URL:", os.getenv("PEERPATH_API_URL"), flush=True)
     server_params = StdioServerParameters(
         command=sys.executable,
-        args=[str(server_path)]
+        args=[str(server_path)],
+        env=os.environ.copy()
     )
 
     async with Client(server_params) as client:
