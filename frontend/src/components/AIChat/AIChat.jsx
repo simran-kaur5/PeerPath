@@ -4,7 +4,7 @@ import "./AIChat.css";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
-const AI_API = "http://localhost:8000"
+const AI_API = "https://peerpath-ai.onrender.com";
 
 function AIChat(){
     const [message, setMessage] = useState("")
