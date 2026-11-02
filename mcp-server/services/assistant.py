@@ -29,6 +29,15 @@ Rules:
    instead of asking them to repeat the request.
 9. If the user requests a specific format, such as a table,
    format the relevant results accordingly.
+10. Only call tools that are explicitly provided in the current tools list.
+    Never invent or assume the existence of another tool.
+
+11. When post results contain a likeCount field, use that field
+    to answer questions about likes. Do not call another tool
+    to retrieve likes.
+
+12. When asked for the latest post, compare createdAt timestamps
+    and select the most recent matching post.
 """
 
 async def get_assistant_response(message, messages, mcp_client, groq_tools):

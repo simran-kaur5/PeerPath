@@ -9,7 +9,7 @@ API_URL = f"{os.getenv('PEERPATH_API_URL', 'http://localhost:5000').rstrip('/')}
 
 @mcp.tool()
 async def get_posts_by_author(author_name:str)-> list:
-    "Get all PeerPath posts written by a particular author"
+    "Get posts written by an author, including their like counts and dates."
 
     async with httpx.AsyncClient(timeout=120.0) as client:
         response = await client.get(API_URL)
@@ -28,9 +28,11 @@ async def get_posts_by_author(author_name:str)-> list:
         if author_name.lower() in name.lower():
 
             results.append({
+                "id": post.get("_id"),
                 "content": post.get("content",""),
                 "author": name,
-                "createdAt":post.get("createdAt")
+                "likeCount": len(post.get("likes") or []),
+                "createdAt": post.get("createdAt")
             })
 
     return results
@@ -52,9 +54,13 @@ async def search_posts(keyword: str)-> list:
         content = post.get("content","")
 
         if(keyword.lower() in content.lower()):
+            author = post.get("author") or {}
+
             results.append({
-                "content":content,
-                "author":post.get("author",{}).get("name","Unknown"),
+                "id": post.get("_id"),
+                "content": content,
+                "author": author.get("name", "Unknown"),
+                "likeCount": len(post.get("likes") or []),
                 "createdAt": post.get("createdAt")
             })
 
