@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { connectionAPI } from "../../services/api";
-import Navbar from "../navigation/Navbar";
 import { UserRound } from "lucide-react";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -57,8 +56,6 @@ export default function ConnectionRequests(){
 
     return (
         <div className="requests-page">
-            <Navbar />
-
             <main className="requests-container">
                 <h1>Connection Requests</h1>
                 <p className="requests-subtitle">

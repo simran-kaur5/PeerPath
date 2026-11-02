@@ -63,7 +63,7 @@ function AIChat(){
     }
 
     return (
-        <div>
+        <div className="ai-chat">
             <h2>PeerPath AI</h2>
 
             <div className="chat-messages">

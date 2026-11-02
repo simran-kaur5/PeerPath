@@ -1,7 +1,6 @@
 import "./SignUp.css";
 import { UserRound, Mail, Lock, BriefcaseBusiness, MapPin } from "lucide-react";
 import {Button} from "@mui/material";
-import Navbar from "../../components/navigation/Navbar";
 import { Link, useNavigate } from "react-router-dom";
 import { userAPI } from "../../services/api";
 import { useState } from "react";
@@ -42,7 +41,6 @@ export default function SignUp() {
   }
   return (
     <div className="signup-page">
-      <Navbar />
 
       <div className="signup-content">
         <div className="signup-card">

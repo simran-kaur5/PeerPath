@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { userAPI } from "../../services/api";
-import Navbar from "../../components/navigation/Navbar";
 import { Button } from "@mui/material";
 import "./EditProfile.css";
 
@@ -93,7 +92,6 @@ export default function EditProfile() {
     if (loading) {
         return (
             <div className="edit-profile-page">
-            <Navbar />
             <p className="edit-loading">Loading profile...</p>
             </div>
         );
@@ -101,7 +99,6 @@ export default function EditProfile() {
 
     return (
         <div className="edit-profile-page">
-        <Navbar />
 
         <div className="edit-profile-container">
             <div className="edit-profile-card">

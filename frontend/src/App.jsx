@@ -21,6 +21,8 @@ import MyConnections from "./components/connections/MyConnections";
 import Notification from "./components/notifications/Notification";
 import AIChat from "./components/AIChat/AIChat";
 
+import MainLayout from "./components/shared/MainLayout";
+
 function EditPostPage() {
     const { id } = useParams();
     return <EditPost id={id} />;
@@ -39,31 +41,35 @@ function PostDetailsPage() {
 function App() {
     return (
         <Routes>
-            <Route path="/" element={sessionStorage.getItem("isLogin") === "true"
-            ? <Navigate to="/feed" replace />
-            : <Home />} />
-            <Route path="/feed" element={<Feed />} />
+            
             <Route path="/login" element={<Login />} />
             <Route path="/signup" element={<SignUp />} />
 
-            <Route path="/posts/:id/edit" element={<EditPostPage />} />
-            <Route path="/posts/:id/delete" element={<DeletePost />} />
-            <Route path="/posts/:id" element={<PostDetailsPage />} />
-
-            {/* Own profile */}
-            <Route path="/profile" element={<Profile />} />
-            <Route path="/profile/edit" element={<EditProfile />} />
-
-            {/* Other people's profiles */}
-            <Route path="/people" element={<People />} />
-            <Route path="/people/:id" element={<PublicView />} />
-            <Route path="/connections" element={<MyConnections />} />
-
-            <Route path="/connections/requests" element={<ConnectionRequests />}/>
-            <Route path="/notifications" element={<Notification/>} />
+            <Route element={<MainLayout />}>
+                <Route path="/" element={sessionStorage.getItem("isLogin") === "true"
+                ? <Navigate to="/feed" replace />
+                : <Home />} />
             
-            <Route path="/ai-chat" element={<AIChat />} />
+                <Route path="/feed" element={<Feed />} />
+                <Route path="/posts/:id/edit" element={<EditPostPage />} />
+                <Route path="/posts/:id/delete" element={<DeletePost />} />
+                <Route path="/posts/:id" element={<PostDetailsPage />} />
 
+                {/* Own profile */}
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/profile/edit" element={<EditProfile />} />
+
+                {/* Other people's profiles */}
+                <Route path="/people" element={<People />} />
+                <Route path="/people/:id" element={<PublicView />} />
+                <Route path="/connections" element={<MyConnections />} />
+
+                <Route path="/connections/requests" element={<ConnectionRequests />}/>
+                <Route path="/notifications" element={<Notification/>} />
+                
+                <Route path="/ai-chat" element={<AIChat />} />
+            </Route>
+            
             <Route path="*" element={<NotFound />} />
         </Routes>
     );

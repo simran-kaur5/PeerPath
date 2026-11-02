@@ -1,7 +1,6 @@
 
 import { useNavigate } from "react-router-dom";
 import { Mail } from "lucide-react";
-import Navbar from "../../components/navigation/Navbar";
 import homePerson from "../../assets/home-person.png";
 import "./Home.css";
 
@@ -18,7 +17,6 @@ export default function Home() {
 
     return (
         <div className="Home">
-            <Navbar />
 
             <main className="homeContent">
                 <section className="tags">

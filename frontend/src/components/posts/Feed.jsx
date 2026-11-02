@@ -1,12 +1,12 @@
 import "./Feed.css";
 import { useState } from "react";
 import { useEffect } from "react";
-import Navbar from "../navigation/Navbar";
 import CreatePost from "./CreatePost.jsx";
 import SuggestedConnections from "../connections/SuggestedConnections";
 import { ThumbsUp,ChevronUp, ChevronDown, CornerDownLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { postAPI, userAPI } from "../../services/api";
+import { Bot } from "lucide-react";
 
 export default function Feed() {
     const [posts,setPosts] = useState([])
@@ -138,9 +138,6 @@ export default function Feed() {
     }
     return (
         <div className="feed-container">
-            <div className="feed-navbar">
-                <Navbar />
-            </div>
 
             <div className="feed-page">
                 <main className="feed-main">
@@ -291,6 +288,13 @@ export default function Feed() {
                     <SuggestedConnections />
                 </aside>
             </div>
+            <button
+                className="ai-chat-float"
+                onClick={() => navigate("/ai-chat")}
+                aria-label="Open PeerPath AI"
+            >
+                <Bot size={26} />
+            </button>
         </div>
     );
 }

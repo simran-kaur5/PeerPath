@@ -8,6 +8,7 @@ export default function Navbar(){
 
     let [isLogin,setisLogin] = useState(false);
     const [profilePicture, setProfilePicture] = useState("");
+    const [authLoading, setAuthLoading] = useState(true);
     const [unreadCount, setUnreadCount] = useState(0);
 
 
@@ -30,11 +31,13 @@ export default function Navbar(){
                 sessionStorage.removeItem("isLogin");
                 setProfilePicture("");
                 setUnreadCount(0);
+            }finally {
+                setAuthLoading(false);
             }
         };
 
         checkLogin();
-    },);
+    },[]);
 
     useEffect(() => {
         if (!isLogin) {
@@ -82,7 +85,7 @@ export default function Navbar(){
                 <Link to="/feed" className="nav-link">Explore</Link>
                 <Link to="/people" className="nav-link">People</Link>
 
-                {isLogin && (
+                {!authLoading  && isLogin && (
                     <>
                         <div onClick={() => navigate("/connections/requests")}>
                             Requests
@@ -106,7 +109,7 @@ export default function Navbar(){
                     </>
                 )}
 
-                {
+                { !authLoading &&
                     isLogin?(
                         <>
                             <button onClick={handleLogout}>Logout</button>

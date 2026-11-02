@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { notificationAPI } from "../../services/api";
-import Navbar from "../navigation/Navbar";
 import { Bell, CheckCheck } from "lucide-react";
 import "./Notification.css";
 import { useNavigate } from "react-router-dom";
@@ -74,8 +73,6 @@ export default function Notification(){
 
     return (
         <div className="notifications-page">
-
-            <Navbar/>
 
             <main>
                 <div className="notifications-header">

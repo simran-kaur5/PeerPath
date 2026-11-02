@@ -273,6 +273,28 @@
     text-decoration: underline;
 }
 
+.feed-container .ai-chat-float {
+    position: fixed;
+    bottom: 25px;
+    right: 25px;
+    width: 80px;
+    height: 80px;
+    border: none;
+    border-radius: 50%;
+    background-color: #0a66c2;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+    z-index: 9999;
+}
+
+.feed-container .ai-chat-float:hover {
+    background-color: #004182;
+}
+
 /* Smaller desktops and tablets */
 @media (max-width: 900px) {
     .feed-page {

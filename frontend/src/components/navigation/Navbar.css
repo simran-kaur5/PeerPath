@@ -10,6 +10,10 @@
     font-size: large;
     background: #fff;
     box-sizing: border-box;
+     position: sticky;
+    top: 0;
+    z-index: 1000;
+    width: 100%;
 }
 
 /* Brand */

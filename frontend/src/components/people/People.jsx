@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { userAPI, connectionAPI } from "../../services/api";
-import Navbar from "../navigation/Navbar";
 import { UserRound, MapPin } from "lucide-react";
 import "./People.css";
 import { useNavigate } from "react-router-dom";
@@ -163,7 +162,6 @@ export default function People(){
     
     return (
     <div className="people-page">
-        <Navbar />
 
         <main className="people-container">
             <h1>Discover People</h1>

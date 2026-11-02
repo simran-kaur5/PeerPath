@@ -1,7 +1,6 @@
 import { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import ProfileView from "./ProfileView";
-import Navbar from "../../components/navigation/Navbar";
 import { userAPI } from "../../services/api";
 import "./PublicView.css";
 
@@ -41,8 +40,6 @@ export default function PublicView() {
 
     return (
         <div className="public-profile-page">
-            <Navbar />
-
             <main className="public-profile-container">
                 {loading ? (
                     <p>Loading profile...</p>

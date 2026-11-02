@@ -1,6 +1,5 @@
 import "./Login.css";
 import { Mail, Lock, UserRound } from "lucide-react";
-import Navbar from "../../components/navigation/Navbar";
 import image from "../../assets/login.png";
 import { useNavigate, Link } from "react-router-dom";
 import { useState } from "react";

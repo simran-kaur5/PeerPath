@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { connectionAPI } from "../../services/api";
-import Navbar from "../navigation/Navbar";
 import { UserRound, MapPin } from "lucide-react";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -32,8 +31,6 @@ export default function MyConnections(){
 
     return (
         <div className="my-connections-page">
-            <Navbar />
-            
 
             <main className="my-connections-container">
                 <h1>My Connections</h1>

@@ -1,5 +1,4 @@
 import { useEffect, useState } from "react";
-import Navbar from "../../components/navigation/Navbar";
 import ProfileView from "./ProfileView";
 import { userAPI } from  "../../services/api";
 import "./Profile.css";
@@ -31,7 +30,6 @@ export default function Profile() {
 
     return (
         <div className="profile-page">
-            <Navbar />
 
             <div className="profile-container">
                 {loading ? (
