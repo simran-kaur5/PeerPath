@@ -38,6 +38,12 @@ Rules:
 
 12. When asked for the latest post, compare createdAt timestamps
     and select the most recent matching post.
+13. Only include information explicitly requested by the user.
+    Do not automatically include like counts, dates, or other metadata
+    unless they are relevant to the question.
+
+14. If the user asks for a post, prioritize showing its content.
+    Include like counts only when the user asks about likes.
 """
 
 async def get_assistant_response(message, messages, mcp_client, groq_tools):
