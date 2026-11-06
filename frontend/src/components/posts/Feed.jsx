@@ -17,6 +17,7 @@ export default function Feed() {
     const [currentUserId, setCurrentUserId] = useState("");
     const [commentInputs, setCommentInputs] = useState({});
     const [expandedComments, setExpandedComments] = useState({});
+    const [commentLoading, setCommentLoading] = useState({});
 
     const navigate = useNavigate();
 
@@ -85,6 +86,11 @@ export default function Feed() {
 
         if (!text) return;
 
+        setCommentLoading(prev => ({
+            ...prev,
+            [postId]: true
+        }));
+
         try{
             const response = await postAPI.post(`/${postId}/comments`,{
                 text
@@ -110,6 +116,10 @@ export default function Feed() {
             setError(
                 error.response?.data?.message || "Could not add comment."
             );
+            setCommentLoading(prev => ({
+                ...prev,
+                [postId]: false
+            }));
         }
     }
 
@@ -224,8 +234,11 @@ export default function Feed() {
                                         }
                                     />
 
-                                    <button onClick={() => handleComment(post._id)}>
-                                        Comment
+                                    <button
+                                        disabled={!commentInputs[post._id]?.trim() || !!commentLoading[post._id]}
+                                        onClick={() => handleComment(post._id)}
+                                    >
+                                        {commentLoading[post._id] ? "Commenting..." : "Comment"}
                                     </button>
                                 </div>
 
