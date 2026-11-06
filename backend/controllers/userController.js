@@ -3,6 +3,7 @@ import Connection from "../models/Connection.js";
 import { StatusCodes } from "http-status-codes";
 import passport from "passport";
 import express from "express";
+import jwt from "jsonwebtoken";
 
 export const getMe = (req,res)=>{
     const user = req.user
@@ -288,6 +289,33 @@ export const searchUsers = async(req,res)=>{
 
         return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             message: "Unable to search users"
+        });
+    }
+}
+
+export const generateAIToken = (req,res)=>{
+    try{
+        const token = jwt.sign(
+            {
+                sub: String(req.user._id)
+            },
+            process.env.AI_TOKEN_SECRET,
+            {
+                expiresIn: "5m",
+                issuer: "peerpath-api",
+                audience: "peerpath-ai"
+            }
+        )
+
+        return res.status(StatusCodes.OK).json({
+            token,
+            expiresIn: 300
+        })
+    }catch(error){
+        console.error("AI token generation failed:", error);
+
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Unable to generate AI token"
         });
     }
 }

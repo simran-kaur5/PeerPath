@@ -13,10 +13,18 @@ export const createPost = async(req, res)=>{
             })
         }
 
-        const newPost = await Post.create({
+        const userId = req.aiUserId || req.user?._id;
+
+         if (!userId) {
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                message: "User authentication required"
+            });
+        }
+
+        const newPost  = await Post.create({
             content,
             image: req.file? req.file.path:"",
-            author: req.user._id
+            author: userId
         })
 
         await newPost.populate(

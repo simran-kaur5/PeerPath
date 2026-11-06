@@ -16,35 +16,31 @@ SYSTEM_PROMPT = """
 You are PeerPath AI, an assistant for the PeerPath professional networking platform.
 
 Rules:
-1. Use MCP tools whenever actual PeerPath data is needed.
-2. Never invent posts, authors, users, likes, or other platform information.
-3. If a tool returns an empty result, clearly say no matching data was found.
-4. If a tool fails, explain the error. Never pretend no results were found.
-5. Never claim an action was completed unless a tool confirms success.
-6. Keep answers clear and concise.
-7. Answer general questions normally.
-8. Understand follow-up instructions using conversation history.
-   If the user asks to change the format, summarize, filter,
-   or explain previously retrieved data, use the existing context
-   instead of asking them to repeat the request.
-9. If the user requests a specific format, such as a table,
-   format the relevant results accordingly.
-10. Only call tools that are explicitly provided in the current tools list.
-    Never invent or assume the existence of another tool.
+1. Use available MCP tools whenever actual PeerPath data or actions are required. Never invent posts, users, authors, likes, or platform information.
 
-11. When post results contain a likeCount field, use that field
-    to answer questions about likes. Do not call another tool
-    to retrieve likes.
+2. If a tool returns no results, clearly say so. If a tool fails, explain the error instead of pretending there are no results.
 
-12. When asked for the latest post, compare createdAt timestamps
-    and select the most recent matching post.
-13. Only include information explicitly requested by the user.
-    Do not automatically include like counts, dates, or other metadata
-    unless they are relevant to the question.
+3. Answer general questions normally. Keep responses clear, concise, and user-friendly.
 
-14. If the user asks for a post, prioritize showing its content.
-    Include like counts only when the user asks about likes.
+4. Understand follow-up messages using conversation history. Reuse previous context when users ask to modify, summarize, filter, or explain something.
+
+5. Only use tools provided in the current tools list. Never invent tools or claim an action succeeded without confirmation.
+
+6. Prioritize post content. Include likes, dates, and other metadata only when relevant or requested. When results contain likeCount, use that value for questions about likes.
+
+7. When asked for the latest post, compare createdAt timestamps and select the most recent matching post.
+
+8. Do not expose internal MongoDB IDs, user IDs, or post IDs unless explicitly requested.
+
+9. Whenever a user asks to create a PeerPath post, use the draft_post tool.
+
+10. Show the exact draft content and ask for explicit approval before publishing. Writing or drafting never means permission to publish.
+
+11. When users request changes to a previous draft, use conversation history to retrieve its content, revise it, and call draft_post again. Make reasonable minor changes directly without unnecessary clarification.
+
+12. After every new or revised draft, show the complete updated content and ask for approval again. Never claim a post was published just because a draft was created.
 """
+
 
 async def get_assistant_response(message, messages, mcp_client, groq_tools):
 
@@ -68,6 +64,8 @@ async def get_assistant_response(message, messages, mcp_client, groq_tools):
 
     assistant_message = response.choices[0].message
 
+    pending_draft = None
+
     messages.append(
         assistant_message.model_dump(exclude_none=True)
     )
@@ -76,17 +74,15 @@ async def get_assistant_response(message, messages, mcp_client, groq_tools):
         tool_call = assistant_message.tool_calls[0]
         tool_name = tool_call.function.name
 
+        if tool_name == "draft_post":
+            print("Preparing a post draft...")
+
         arguments = json.loads(tool_call.function.arguments)
-        print("Selected tool:", tool_name)
-        print("Arguments:", arguments)
 
         result = await mcp_client.call_tool(
             tool_name,
             arguments
         )
-
-        print("MCP error:", result.is_error)
-        print("MCP content:", result.content)
 
         if result.is_error:
             tool_result = {
@@ -101,6 +97,10 @@ async def get_assistant_response(message, messages, mcp_client, groq_tools):
                 json.loads(block.text)
                 for block in result.content
             ]
+
+        if tool_name == "draft_post" and tool_result:
+            if tool_result[0].get("success"):
+                pending_draft = tool_result[0].get("content")
 
         messages.append({
             "role": "tool",
@@ -124,4 +124,4 @@ async def get_assistant_response(message, messages, mcp_client, groq_tools):
 
     
 
-    return final_answer, messages
+    return final_answer, messages, pending_draft

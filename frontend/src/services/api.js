@@ -1,6 +1,6 @@
 import axios from "axios";
 
-const BASE_URL = "https://peerpath-26mg.onrender.com" || "http://localhost:5000";
+const BASE_URL = "http://localhost:5000";
 const postAPI = axios.create({
     baseURL: `${BASE_URL}/posts`,
     withCredentials: true
@@ -20,7 +20,7 @@ const notificationAPI = axios.create({
     baseURL: `${BASE_URL}/notifications`,
     withCredentials: true
 })
-
+// "https://peerpath-26mg.onrender.com" || 
 // console.log("API URL:", BASE_URL);
 
 export { postAPI,userAPI, connectionAPI,notificationAPI};

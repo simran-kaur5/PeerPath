@@ -126,5 +126,29 @@ async def get_trending_posts(limit: int =5)->list:
         })
 
     return results
+
+@mcp.tool()
+async def draft_post(content: str)-> dict:
+    """Prepare a PeerPath post draft for the user to review.
+    This tool does not publish the post."""
+
+    if not content or not content.strip():
+        return {
+            "success": False,
+            "message": "Post content cannot be empty."
+        }
+
+    if len(content) > 3000:
+        return {
+            "success": False,
+            "message": "Post cannot exceed 3000 characters."
+        }
+
+    return {
+        "success": True,
+        "status": "draft",
+        "content": content,
+        "message": "Draft prepared. Show it to the user and ask for explicit confirmation before publishing."
+    }
 if __name__ == "__main__":
     mcp.run()

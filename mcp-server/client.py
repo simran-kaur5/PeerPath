@@ -1,9 +1,8 @@
 import asyncio
 import sys
 from pathlib import Path
-import json
 import os
-
+import json
 from mcp import Client, StdioServerParameters
 from groq import AsyncGroq
 from dotenv import load_dotenv
@@ -13,7 +12,7 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 if not GROQ_API_KEY:
-    raise ValueError("GROQ_API_KEY not found in .env file")
+    raise ValueError("GROQ_API_KEY is missing from environment variables")
 
 groq = AsyncGroq(api_key=GROQ_API_KEY)
 
@@ -82,7 +81,6 @@ async def main():
 
             while True:
 
-
                 response = await groq.chat.completions.create(
                     model= MODEL,
                     messages= messages,
@@ -94,7 +92,7 @@ async def main():
 
                 # if groq does not select a tool
                 if not assistant_message.tool_calls:
-                    print("PeerPath AI: ",assistant_message.content)
+                    
                     messages.append({
                         "role": "assistant",
                         "content": assistant_message.content or ""
@@ -106,8 +104,6 @@ async def main():
                     assistant_message.model_dump(exclude_none=True)
                 )
 
-                print("messages",messages)
-
                 for tool_call in assistant_message.tool_calls:
                     tool_name = tool_call.function.name
 
@@ -115,8 +111,6 @@ async def main():
                         tool_call.function.arguments
                     )
 
-                    print(f"\nCalling MCP tool: {tool_name}")
-                    print("Arguments:", arguments)
 
                     try:
                         result = await client.call_tool(
@@ -154,8 +148,6 @@ async def main():
                             "details": str(e)
                         }
 
-                    print("\nDEBUG - MCP Tool Output:")
-                    print(json.dumps(tool_output, indent=4))
                     messages.append({
                         "role": "tool",
                         "tool_call_id":tool_call.id,

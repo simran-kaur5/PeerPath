@@ -2,7 +2,7 @@ import express from "express"
 import { isLoggedIn, validateBody } from "../middleware.js";
 import multer from "multer";
 import { storage } from "../cloudConfig.js";
-import { getMe, updateMe, updateProfilePicture, getUsers, registerUser, loginUser, logoutUser, updateProfile, getPublicUser, searchUsers } from "../controllers/userController.js";
+import { getMe, updateMe, updateProfilePicture, getUsers, registerUser, loginUser, logoutUser, updateProfile, getPublicUser, searchUsers, generateAIToken } from "../controllers/userController.js";
 
 const upload = multer({ storage });
 const router = express.Router()
@@ -26,6 +26,8 @@ router.post("/logout",logoutUser)
 router.put("/profile",isLoggedIn,validateBody, updateProfile)
 
 router.get("/search", isLoggedIn, searchUsers);
+
+router.get("/ai-token", isLoggedIn, generateAIToken);
 
 router.get("/:id", isLoggedIn, getPublicUser)
 

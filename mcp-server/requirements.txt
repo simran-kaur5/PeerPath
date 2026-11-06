@@ -4,3 +4,5 @@ python-dotenv
 groq
 fastapi
 uvicorn
+python-multipart
+PyJWT

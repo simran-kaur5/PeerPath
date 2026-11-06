@@ -7,6 +7,8 @@ import { ThumbsUp,ChevronUp, ChevronDown, CornerDownLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { postAPI, userAPI } from "../../services/api";
 import { Bot } from "lucide-react";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
 
 export default function Feed() {
     const [posts,setPosts] = useState([])
@@ -171,7 +173,9 @@ export default function Feed() {
                                     <small>Posted by</small>
                                 </div>
                                 </div>
-                            <p>{post.content}</p>
+                            <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                                {post.content}
+                            </ReactMarkdown>
 
                             {post.image && (
                                 <img

@@ -1,7 +1,7 @@
 import express from "express"
 import multer from "multer";
 import {storage} from "../cloudConfig.js"
-import { isLoggedIn,isOwner,validateBody,validatePost } from "../middleware.js";
+import { isLoggedIn,isOwner,validateBody,validatePost, verifyAIToken } from "../middleware.js";
 import { createPost, getPosts, toggleLike, addComment, deleteComment, getPost, updatePost, deletePost } from "../controllers/postController.js";
 
 const upload = multer({ storage });
@@ -11,6 +11,8 @@ const router = express.Router()
 router.post("/",isLoggedIn,upload.single("image"),validateBody,validatePost,createPost);
 
 router.get("/", getPosts)
+
+router.post("/ai", verifyAIToken,upload.single("image"), validateBody, validatePost, createPost)
 
 router.patch("/:id/like",isLoggedIn,toggleLike)
 

@@ -3,6 +3,7 @@ import postSchema from "./schemas/posts.js"
 import ExpressError from "./utils.js/ExpressError.js";
 import Post from "./models/Post.js";
 import mongoose from "mongoose";
+import jwt from "jsonwebtoken";
 
 
 export const validatePost = (req,res,next)=>{
@@ -65,4 +66,36 @@ export const validateBody = (req,res,next)=>{
     }
 
     next()
+}
+
+export const verifyAIToken = (req,res,next)=>{
+    console.log("hi")
+    try{
+        const authHeader = req.headers.authorization;
+
+        if(!authHeader || !authHeader.startsWith("Bearer ")){
+            return res.status(StatusCodes.UNAUTHORIZED).json({
+                message: "AI authentication token is required"
+            });
+        }
+
+        const token = authHeader.split(" ")[1];
+
+        const decoded = jwt.verify(
+            token,
+            process.env.AI_TOKEN_SECRET,
+            {
+                issuer: "peerpath-api",
+                audience: "peerpath-ai"
+            }
+        )
+
+        req.aiUserId = decoded.sub;
+
+        next()
+    }catch (error) {
+        return res.status(StatusCodes.UNAUTHORIZED).json({
+            message: "Invalid or expired AI token"
+        });
+    }
 }
