@@ -5,7 +5,7 @@ import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import { userAPI } from "../../services/api";
 
-const AI_API = import.meta.env.VITE_AI_API_URL;
+const AI_API = "https://peerpath-ai.onrender.com";
 
 function AIChat(){
     const [message, setMessage] = useState("")
