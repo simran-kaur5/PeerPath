@@ -4,7 +4,7 @@ PeerPath is a full-stack professional networking platform that helps users build
 
 Users can create personalized profiles, publish posts, interact through likes and comments, connect with other professionals, and stay updated with notifications.
 
-PeerPath also features an **AI-powered assistant built with Groq and Model Context Protocol (MCP)** that can understand natural-language queries, retrieve platform data, search posts, identify trending content, and answer questions using real application data.
+PeerPath also features an AI-powered assistant built with Groq and Model Context Protocol (MCP). It can retrieve real platform data, search posts, identify trending content, answer natural-language questions, and generate professional post drafts that users can review, edit, attach images to, and publish with their approval.
 
 Built using React, Node.js, Express.js, MongoDB, FastAPI, Groq, and MCP, PeerPath aims to make professional networking simple, engaging, and intelligent.
 
@@ -41,6 +41,27 @@ PeerPath includes an AI assistant powered by **Groq LLM and MCP (Model Context P
 - **Context-Aware Conversations** — Handle follow-up questions using conversation history.
 - **MCP Tool Calling** — The LLM selects and invokes appropriate MCP tools based on user requests.
 - **Real-Time Application Data** — Retrieve actual post information through the PeerPath backend rather than relying on predefined responses.
+
+
+**AI Post Generation and Publishing**
+
+- **AI Post Drafting** — Generate professional networking posts using natural-language instructions.
+
+- **Draft Preview** — Display the complete generated post before publishing.
+
+- **Draft Revision** — Request changes to an existing draft through conversation.
+
+- **Approval-Based Publishing** — Require explicit user approval before publishing a generated post.
+
+- **Image Attachment** — Attach an optional image to an AI-generated post.
+
+- **Image Preview and Removal** — Preview an attached image and remove it before publishing.
+
+- **Post Publishing** — Publish the approved draft with its optional image directly to PeerPath.
+
+- **Authenticated Publishing** — Use JWT-based authentication to verify the user before publishing.
+
+The AI assistant does not automatically publish generated content. Users remain in control of the final post.
 
 ## AI Architecture
 
@@ -81,7 +102,58 @@ PeerPath uses MCP to connect its AI assistant with the platform's backend servic
              User
 ```
 
-**How it works:**
+**AI Post Publishing Workflow**
+
+```text
+          User Request
+                |
+                v
+          React Chat UI
+                |
+                v
+           FastAPI API
+                |
+                v
+             Groq LLM
+                |
+                v
+          draft_post Tool
+                |
+                v
+            MCP Server
+                |
+                v
+         Draft Generation
+                |
+                v
+       Draft Preview in Chat
+                |
+                v
+       User Reviews the Draft
+                |
+                v
+       Optional Image Upload
+                |
+                v
+       Explicit User Approval
+                |
+                v
+         FastAPI /publish
+                |
+                v
+        Express Backend API
+                |
+                v
+       Multer + Cloudinary
+                |
+                v
+             MongoDB
+                |
+                v
+        Post Published on Feed
+```
+
+**How the AI Assistant Works**
 
 1. The user sends a natural-language query through the AI chat interface.
 2. FastAPI forwards the request to the AI assistant.
@@ -91,6 +163,19 @@ PeerPath uses MCP to connect its AI assistant with the platform's backend servic
 6. The retrieved results are sent back to the LLM.
 7. Groq generates a contextual response for the user.
 
+
+**How AI Post Publishing Works**
+
+1. The user asks PeerPath AI to create a post.
+2. Groq selects the draft_post MCP tool.
+3. The assistant generates a draft and displays its complete content.
+4. The user can request revisions or attach an optional image.
+5. The user explicitly approves publishing.
+6. FastAPI verifies the user's JWT and retrieves the pending draft.
+7. FastAPI forwards the post content and optional image to the Express backend.
+8. Express processes the image upload through Multer and Cloudinary.
+9. The post is saved in MongoDB and becomes available on the PeerPath feed.
+
 ## Tech Stack
 
 | Category | Technologies |
@@ -98,7 +183,7 @@ PeerPath uses MCP to connect its AI assistant with the platform's backend servic
 | Frontend | React, Vite, React Router, Axios, Material UI |
 | Backend | Node.js, Express.js |
 | Database | MongoDB Atlas, Mongoose |
-| Authentication | Passport.js, Express Session, Connect-Mongo |
+| Authentication | Passport.js, Express Session, Connect-Mongo, JWT |
 | Image Storage | Cloudinary |
 | AI / LLM | Groq API, GPT-OSS-120B |
 | AI Backend | Python, FastAPI |
