@@ -20,7 +20,7 @@ export default function Delete({ id }) {
 
         try {
             await postAPI.delete(`/${id}`);
-            navigate("/");
+            navigate("/feed");
         } catch (err) {
 
             if (err.response?.status === 401) {
