@@ -1,3 +1,4 @@
+
 /* Navbar layout */
 .Navbar {
     display: flex;
@@ -6,12 +7,13 @@
     gap: 20px;
     width: 100%;
     padding: 12px 5%;
-    font-size: 1rem;
+    font-size: large;
     background: #fff;
     box-sizing: border-box;
-    position: sticky;
+     position: sticky;
     top: 0;
     z-index: 1000;
+    width: 100%;
 }
 
 /* Brand */
@@ -25,12 +27,11 @@
 .title {
     color: #0A66C2;
     font-weight: 600;
-    font-size: 2rem;
-    white-space: nowrap;
+    font-size: 2.2rem;
 }
 
 .icon {
-    padding: 9px 12px;
+    padding: 10px 15px;
     border-radius: 13px;
     background-color: #0A66C2;
     color: white;
@@ -44,8 +45,8 @@
     display: flex;
     align-items: center;
     justify-content: flex-end;
-    gap: 20px;
-    font-size: 1rem;
+    gap: 22px;
+    font-size: 1.1rem;
     cursor: pointer;
     min-width: 0;
 }
@@ -71,7 +72,7 @@
 .loginButton,
 .options > button {
     border: none;
-    padding: 9px 18px;
+    padding: 10px 20px;
     border-radius: 4rem;
     background-color: #0A66C2;
     color: white;
@@ -80,7 +81,7 @@
 }
 
 .options > button {
-    font-size: 0.95rem;
+    font-size: 1rem;
     cursor: pointer;
 }
 
@@ -127,7 +128,7 @@
     background: transparent;
     color: inherit;
     cursor: pointer;
-    padding: 6px;
+    padding: 8px;
     flex-shrink: 0;
 }
 
@@ -151,12 +152,12 @@
 /* Tablets */
 @media (max-width: 900px) {
     .Navbar {
-        padding: 11px 3%;
+        padding: 12px 3%;
         gap: 12px;
     }
 
     .title {
-        font-size: 1.7rem;
+        font-size: 1.8rem;
     }
 
     .icon {
@@ -164,97 +165,70 @@
     }
 
     .options {
-        gap: 12px;
-        font-size: 0.9rem;
+        gap: 14px;
+        font-size: 1rem;
     }
 
     .loginButton,
     .options > button {
-        padding: 8px 12px;
+        padding: 9px 14px;
     }
 }
 
 /* Mobile phones */
 @media (max-width: 600px) {
     .Navbar {
-        flex-wrap: nowrap;
-        padding: 10px 12px;
+        flex-wrap: wrap;
+        padding: 12px 16px;
         gap: 12px;
-        overflow: hidden;
-    }
-
-    .name {
-        gap: 6px;
     }
 
     .title {
-        font-size: 1.4rem;
+        font-size: 1.65rem;
     }
 
     .icon {
         padding: 7px 9px;
-        border-radius: 9px;
+        border-radius: 10px;
     }
 
     .options {
-        flex: 1;
-        width: 0;
-        min-width: 0;
-        justify-content: flex-start;
-        gap: 16px;
-        flex-wrap: nowrap;
-        overflow-x: auto;
-        overflow-y: hidden;
-        white-space: nowrap;
-        font-size: 0.85rem;
-        scrollbar-width: none;
-        -webkit-overflow-scrolling: touch;
+        width: 100%;
+        justify-content: space-between;
+        gap: 10px;
+        flex-wrap: wrap;
+        font-size: 0.95rem;
     }
 
-    .options::-webkit-scrollbar {
-        display: none;
-    }
-
-    .nav-link {
-        flex-shrink: 0;
-    }
-
-    .options > button,
-    .loginButton {
-        flex-shrink: 0;
-        padding: 7px 11px;
-        font-size: 0.82rem;
+    .loginButton,
+    .options > button {
+        padding: 8px 14px;
+        font-size: 0.9rem;
     }
 
     .navbar-profile {
-        width: 30px;
-        height: 30px;
-    }
-
-    .notification-bell {
-        padding: 5px;
+        width: 32px;
+        height: 32px;
     }
 }
 
 /* Very small phones */
 @media (max-width: 360px) {
     .Navbar {
-        padding: 9px 8px;
-        gap: 8px;
+        padding: 10px;
     }
 
     .title {
-        font-size: 1.2rem;
+        font-size: 1.4rem;
     }
 
     .options {
-        gap: 12px;
-        font-size: 0.8rem;
+        gap: 8px;
+        font-size: 0.85rem;
     }
 
-    .options > button,
-    .loginButton {
-        padding: 6px 9px;
-        font-size: 0.78rem;
+    .loginButton,
+    .options > button {
+        padding: 7px 10px;
     }
 }
