@@ -24,36 +24,33 @@ function AIChat(){
     }, [messages, loading]);
 
     const sendMessage = async (e) =>{
-        e.preventDefault()
+        e.preventDefault();
 
-        let token = null
+        if (!message.trim() || loading) return;
+
+        const userMessage = message.trim();
+
+        setMessages((prev) => [
+            ...prev,
+            { role: "user", content: userMessage }
+        ]);
+
+        setMessage("")
+        setLoading(true)
+
 
         try{
-            const tokenResponse = await userAPI.get("/ai-token", {
-                withCredentials: true
-            });
-            token = tokenResponse.data.token;
+            let token = null
+            try{
+                const tokenResponse = await userAPI.get("/ai-token", {
+                    withCredentials: true
+                });
+                token = tokenResponse.data.token;
             } catch (error) {
                 if (error.response?.status !== 401) {
                     throw error;
                 }
             }
-
-
-
-        if(!message.trim() || loading) return
-        
-        const userMessage = message.trim()
-
-        setMessages((prev)=>[
-            ...prev,
-            {role:"user", content: userMessage}
-        ])
-
-        setMessage("")
-        setLoading(true)
-
-        try{
             const response = await axios.post(`${AI_API}/chat`,{
                 message: userMessage,
                 conversation_id: conversationId
