@@ -1,6 +1,7 @@
 import axios from "axios";
 
-const BASE_URL = "https://peerpath-26mg.onrender.com";
+const BASE_URL = "http://localhost:5000";
+// "https://peerpath-26mg.onrender.com" ||
 const postAPI = axios.create({
     baseURL: `${BASE_URL}/posts`,
     withCredentials: true

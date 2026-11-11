@@ -18,6 +18,9 @@ export default function Feed() {
     const [commentInputs, setCommentInputs] = useState({});
     const [expandedComments, setExpandedComments] = useState({});
     const [commentLoading, setCommentLoading] = useState({});
+    const [hasMore, setHasMore] = useState(false);
+    const [nextCursor, setNextCursor] = useState(null);
+    const [loadingMore, setLoadingMore] = useState(false);
 
     const navigate = useNavigate();
 
@@ -27,7 +30,9 @@ export default function Feed() {
             try{
                 let response = await postAPI.get("/")
                 // console.log(response)
-                setPosts(response.data)
+                setPosts(response.data.posts)
+                setHasMore(response.data.hasMore)
+                setNextCursor(response.data.nextCursor)
             }catch(error){
                 console.error("Failed to fetch posts:", error);
                 setError("Could not load posts")
@@ -52,6 +57,26 @@ export default function Feed() {
 
         fetchCurrentUser();
     }, []);
+
+    const loadMorePosts = async () =>{
+        if(!hasMore || !nextCursor || loadingMore) return;
+
+        try{
+            setLoading(true)
+
+            const response = await postAPI.get("/",{
+                params: nextCursor
+            })
+
+            setPosts(prev=> [...prev, ...response.data.posts])
+            setHasMore(response.data.hasMore);
+            setNextCursor(response.data.nextCursor);
+        }catch (error) {
+            console.error("Failed to load more posts:", error);
+        } finally {
+            setLoadingMore(false);
+        }
+    }
 
     const handleLike = async (postId)=>{
         if (sessionStorage.getItem("isLogin") !== "true") {
@@ -298,7 +323,15 @@ export default function Feed() {
                             </small>
                         </article>
                     ))}
-
+                    {hasMore && (
+                        <button
+                            className="load-more-btn"
+                            onClick={loadMorePosts}
+                            disabled={loadingMore}
+                        >
+                            {loadingMore ? "Loading..." : "Load More"}
+                        </button>
+                    )}
                 </main>
 
                 <aside className="feed-sidebar">

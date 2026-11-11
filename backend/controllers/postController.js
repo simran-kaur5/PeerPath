@@ -46,12 +46,52 @@ export const createPost = async(req, res)=>{
 }
 
 export const getPosts = async(req,res)=>{
+    const PAGE_SIZE = 10;
+
     try{
-        let posts = await Post.find().populate("author","username name profilePicture")
+        const {cursorCreatedAt, cursorId} = req.query;
+        const filter = {}
+
+        if(cursorCreatedAt || cursorId){
+            const cursorDate = new Date(cursorCreatedAt)
+
+            if(!cursorCreatedAt || !cursorId || Number.isNaN(cursorDate.getTime()) || !mongoose.Types.ObjectId.isValid(cursorId)){
+                return res.status(StatusCodes.BAD_REQUEST).json({
+                    message: "Invalid pagination cursor"
+                })
+            }
+
+            filter.$or = [
+                {
+                    createdAt : { $lt: cursorDate }
+                },
+                {
+                    createdAt: cursorDate,
+                    _id:{
+                        $lt: new mongoose.Types.ObjectId(cursorId)
+                    }
+                }
+            ]
+        }
+
+        let posts = await Post.find(filter).sort({createdAt: -1, _id:-1}).limit(PAGE_SIZE+1)
+                                    .populate("author","username name profilePicture")
                                     .populate("comments.author", "username name profilePicture")
                                     .sort({createdAt:-1})
 
-        res.status(StatusCodes.OK).json(posts)
+        const hasMore = posts.length>PAGE_SIZE
+
+        if(hasMore){
+            posts = posts.slice(0, PAGE_SIZE);
+        }
+
+        const lastPost = posts[posts.length -1]
+
+        const nextCursor = hasMore && lastPost? {
+            cursorCreatedAt: lastPost.createdAt,
+            cursorId: lastPost._id
+        }: null;
+        res.status(StatusCodes.OK).json({posts, hasMore, nextCursor})
     }catch(error){
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
             message:"Failed to fetch posts",

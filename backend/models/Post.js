@@ -49,6 +49,8 @@ const PostSchema = new mongoose.Schema({
         timestamps:true
 })
 
+PostSchema.index({createdAt: -1, _id: -1})
+
 const Post = mongoose.model("Post",PostSchema)
 
 export default Post;

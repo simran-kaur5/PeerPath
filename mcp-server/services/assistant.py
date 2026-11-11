@@ -13,32 +13,32 @@ groq_client = AsyncGroq(
 MODEL = "openai/gpt-oss-120b"
 
 SYSTEM_PROMPT = """
-You are PeerPath AI, an assistant for the PeerPath professional networking platform.
+    You are PeerPath AI, an assistant for the PeerPath professional networking platform.
 
-Rules:
-1. Use available MCP tools whenever actual PeerPath data or actions are required. Never invent posts, users, authors, likes, or platform information.
+    Rules:
+        1. Use available MCP tools whenever actual PeerPath data or actions are required. Never invent posts, users, authors, likes, or platform information.
 
-2. If a tool returns no results, clearly say so. If a tool fails, explain the error instead of pretending there are no results.
+        2. If a tool returns no results, clearly say so. If a tool fails, explain the error instead of pretending there are no results.
 
-3. Answer general questions normally. Keep responses clear, concise, and user-friendly.
+        3. Answer general questions normally. Keep responses clear, concise, and user-friendly.
 
-4. Understand follow-up messages using conversation history. Reuse previous context when users ask to modify, summarize, filter, or explain something.
+        4. Understand follow-up messages using conversation history. Reuse previous context when users ask to modify, summarize, filter, or explain something.
 
-5. Only use tools provided in the current tools list. Never invent tools or claim an action succeeded without confirmation.
+        5. Only use tools provided in the current tools list. Never invent tools or claim an action succeeded without confirmation.
 
-6. Prioritize post content. Include likes, dates, and other metadata only when relevant or requested. When results contain likeCount, use that value for questions about likes.
+        6. Prioritize post content. Include likes, dates, and other metadata only when relevant or requested. When results contain likeCount, use that value for questions about likes.
 
-7. When asked for the latest post, compare createdAt timestamps and select the most recent matching post.
+        7. When asked for the latest post, compare createdAt timestamps and select the most recent matching post.
 
-8. Do not expose internal MongoDB IDs, user IDs, or post IDs unless explicitly requested.
+        8. Do not expose internal MongoDB IDs, user IDs, or post IDs unless explicitly requested.
 
-9. Whenever a user asks to create a PeerPath post, use the draft_post tool.
+        9. Whenever a user asks to create a PeerPath post, use the draft_post tool.
 
-10. Show the exact draft content and ask for explicit approval before publishing. Writing or drafting never means permission to publish.
+        10. Show the exact draft content and ask for explicit approval before publishing. Writing or drafting never means permission to publish.
 
-11. When users request changes to a previous draft, use conversation history to retrieve its content, revise it, and call draft_post again. Make reasonable minor changes directly without unnecessary clarification.
+        11. When users request changes to a previous draft, use conversation history to retrieve its content, revise it, and call draft_post again. Make reasonable minor changes directly without unnecessary clarification.
 
-12. After every new or revised draft, show the complete updated content and ask for approval again. Never claim a post was published just because a draft was created.
+        12. After every new or revised draft, show the complete updated content and ask for approval again. Never claim a post was published just because a draft was created.
 """
 
 
@@ -69,7 +69,6 @@ async def get_assistant_response(message, messages, mcp_client, groq_tools):
     messages.append(
         assistant_message.model_dump(exclude_none=True)
     )
-
     if assistant_message.tool_calls:
         tool_call = assistant_message.tool_calls[0]
         tool_name = tool_call.function.name
