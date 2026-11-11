@@ -43,7 +43,7 @@ PeerPath includes an AI assistant powered by **Groq LLM and MCP (Model Context P
 - **Real-Time Application Data** — Retrieve actual post information through the PeerPath backend rather than relying on predefined responses.
 
 
-**AI Post Generation and Publishing**
+## AI Post Generation and Publishing
 
 - **AI Post Drafting** — Generate professional networking posts using natural-language instructions.
 
@@ -62,6 +62,13 @@ PeerPath includes an AI assistant powered by **Groq LLM and MCP (Model Context P
 - **Authenticated Publishing** — Use JWT-based authentication to verify the user before publishing.
 
 The AI assistant does not automatically publish generated content. Users remain in control of the final post.
+
+### Cursor-Based Feed Pagination
+- Implemented cursor-based pagination to load posts in batches of 10.
+- Uses `createdAt` and MongoDB `_id` as a compound cursor to ensure deterministic ordering.
+- Uses `$lt` conditions to fetch older posts without skipping posts that share the same timestamp.
+- Fetches one extra document (`PAGE_SIZE + 1`) to determine whether more posts are available.
+- Added a Load More button to fetch and append subsequent posts without reloading the feed.
 
 ## AI Architecture
 
