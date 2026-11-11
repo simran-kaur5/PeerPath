@@ -46,25 +46,18 @@ PeerPath includes an AI assistant powered by **Groq LLM and MCP (Model Context P
 ## AI Post Generation and Publishing
 
 - **AI Post Drafting** — Generate professional networking posts using natural-language instructions.
-
 - **Draft Preview** — Display the complete generated post before publishing.
-
 - **Draft Revision** — Request changes to an existing draft through conversation.
-
 - **Approval-Based Publishing** — Require explicit user approval before publishing a generated post.
-
 - **Image Attachment** — Attach an optional image to an AI-generated post.
-
 - **Image Preview and Removal** — Preview an attached image and remove it before publishing.
-
 - **Post Publishing** — Publish the approved draft with its optional image directly to PeerPath.
-
 - **Authenticated Publishing** — Use JWT-based authentication to verify the user before publishing.
 
 The AI assistant does not automatically publish generated content. Users remain in control of the final post.
 
 ### Cursor-Based Feed Pagination
-- Implemented cursor-based pagination to load posts in batches of 10.
+- Implemented cursor-based pagination to load posts in batches of 5.
 - Uses `createdAt` and MongoDB `_id` as a compound cursor to ensure deterministic ordering.
 - Uses `$lt` conditions to fetch older posts without skipping posts that share the same timestamp.
 - Fetches one extra document (`PAGE_SIZE + 1`) to determine whether more posts are available.
