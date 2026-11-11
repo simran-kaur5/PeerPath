@@ -46,7 +46,7 @@ export const createPost = async(req, res)=>{
 }
 
 export const getPosts = async(req,res)=>{
-    const PAGE_SIZE = 10;
+    const PAGE_SIZE = 5;
 
     try{
         const {cursorCreatedAt, cursorId} = req.query;
