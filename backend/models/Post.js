@@ -49,7 +49,7 @@ const PostSchema = new mongoose.Schema({
         timestamps:true
 })
 
-PostSchema.index({createdAt: -1, _id: -1})
+PostSchema.index({author: 1,createdAt: -1, _id: -1})
 
 const Post = mongoose.model("Post",PostSchema)
 

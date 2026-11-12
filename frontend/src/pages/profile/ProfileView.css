@@ -48,6 +48,38 @@
     font-size: 13px;
 }
 
+.load-more-profile-btn {
+    display: block !important;
+    margin: 25px auto !important;
+    padding: 10px 28px !important;
+
+    border: 1px solid #d1d5db !important;
+    border-radius: 8px !important;
+
+    background-color: #ffffff !important;
+    color: #374151 !important;
+
+    font-size: 14px !important;
+    font-weight: 600 !important;
+    text-transform: none !important;
+
+    transition: all 0.2s ease !important;
+}
+
+.load-more-profile-btn:hover {
+    background-color: #f3f4f6 !important;
+    border-color: #9ca3af !important;
+}
+
+.load-more-profile-btn:active {
+    transform: scale(0.98);
+}
+
+.load-more-profile-btn.Mui-disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
 @media (max-width: 480px) {
     .profile-post-image {
         height: 180px;

@@ -30,6 +30,12 @@ export default function ProfileView({ user, isOwnProfile = false }) {
     const [uploading, setUploading] = useState(false);
     const [uploadError, setUploadError] = useState("");
 
+    const [hasMorePosts, setHasMorePosts] = useState(false);
+    const [nextPostCursor, setNextPostCursor] = useState(null);
+    const [loadingMorePosts, setLoadingMorePosts] = useState(false);
+    const [loadMorePostsError, setLoadMorePostsError] = useState("");
+
+    const profileUserId = user?._id || user?.id;
 
     useEffect(()=>{
         let active = true
@@ -37,21 +43,18 @@ export default function ProfileView({ user, isOwnProfile = false }) {
         const fetchUserPosts = async()=>{
             setPostsLoading(true)
             setPostsError("")
+            setPosts([]);
+            setHasMorePosts(false);
+            setNextPostCursor(null);
+            setLoadMorePostsError("");
 
             try{
-                const response = await postAPI.get("/")
-
-                const allPosts = response.data.posts || response.data
-
-                const profileUserId = String(user._id || user.id)
-
-                const userPosts = allPosts.filter((post)=>{
-                    const authorId = post.author?._id || post.author;
-                    return String(authorId) === profileUserId;
-                })
+                const response = await postAPI.get(`/author/${profileUserId}`)
 
                 if (active) {
-                    setPosts(userPosts);
+                    setPosts(response.data.posts || []);
+                    setHasMorePosts(response.data.hasMore);
+                    setNextPostCursor(response.data.nextCursor);
                 }
             }catch (err) {
                 if (active) {
@@ -65,13 +68,17 @@ export default function ProfileView({ user, isOwnProfile = false }) {
             }
         }
 
-        if (user?._id || user?.id) {
+        if (profileUserId) {
             fetchUserPosts();
+        }else {
+            setPosts([]);
+            setPostsLoading(false);
+            setPostsError("Unable to identify this profile.");
         }
         return () => {
             active = false;
         };  
-    } ,[user?._id, user?.id])
+    } ,[profileUserId])
 
     useEffect(()=>{
         if(isOwnProfile || !user?._id){
@@ -165,6 +172,35 @@ export default function ProfileView({ user, isOwnProfile = false }) {
             e.target.value = "";
         }
     };
+
+    const loadMoreProfilePosts = async ()=>{
+        if (
+            !profileUserId ||
+            !hasMorePosts ||
+            !nextPostCursor ||
+            loadingMorePosts
+        ) {
+            return;
+        }
+
+        try{
+            setLoadingMorePosts(true)
+            setLoadMorePostsError("")
+
+            const response = await postAPI.get(`/author/${profileUserId}`,{
+                params: nextPostCursor,
+            })
+
+            setPosts(prevPosts=> [...prevPosts, ...(response.data.posts || [])])
+            setHasMorePosts(response.data.hasMore)
+            setNextPostCursor(response.data.nextCursor)
+        }catch(error){
+            console.error("Failed to load more profile posts:", error);
+            setLoadMorePostsError("Unable to load more posts. Please try again.");
+        } finally {
+            setLoadingMorePosts(false);
+        }
+    }
 
     return (
         <>
@@ -347,6 +383,23 @@ export default function ProfileView({ user, isOwnProfile = false }) {
                             </article>
                         ))}
                     </div>
+                )}
+
+                {loadMorePostsError && (
+                    <p className="profile-error">
+                        {loadMorePostsError}
+                    </p>
+                )}
+
+                {!postsLoading && !postsError && hasMorePosts && (
+                    <Button
+                        variant="outlined"
+                        className="load-more-profile-btn"
+                        onClick={loadMoreProfilePosts}
+                        disabled={loadingMorePosts}
+                    >
+                        {loadingMorePosts ? "Loading..." : "Load More"}
+                    </Button>
                 )}
             </section>
         </>

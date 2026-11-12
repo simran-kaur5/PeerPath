@@ -77,7 +77,6 @@ export const getPosts = async(req,res)=>{
         let posts = await Post.find(filter).sort({createdAt: -1, _id:-1}).limit(PAGE_SIZE+1)
                                     .populate("author","username name profilePicture")
                                     .populate("comments.author", "username name profilePicture")
-                                    .sort({createdAt:-1})
 
         const hasMore = posts.length>PAGE_SIZE
 
@@ -341,5 +340,86 @@ export const deletePost = async(req,res)=>{
         return res.status(StatusCodes.BAD_REQUEST).json({
             message:"Error occured"
         })
+    }
+}
+
+export const getPostsByAuthor = async (req,res)=>{
+    const PAGE_SIZE = 1;
+
+    try{
+        const {userId} = req.params
+
+        const {cursorCreatedAt, cursorId} = req.query;
+
+
+        if(!mongoose.isValidObjectId(userId)){
+            return res.status(StatusCodes.BAD_REQUEST).json({
+                message: "Invalid user ID"
+            })
+        }
+
+        const filter = {
+            author: new mongoose.Types.ObjectId(userId)
+        }
+
+        const hasCursor = cursorCreatedAt !== undefined || cursorId !== undefined;
+
+        if(hasCursor){
+            const cursorDate = new Date(cursorCreatedAt)
+
+            if(typeof cursorCreatedAt !== "string" ||
+                typeof cursorId !== "string" ||
+                !cursorCreatedAt ||
+                !mongoose.isValidObjectId(cursorId) ||
+                Number.isNaN(cursorDate.getTime())){
+                    return res.status(StatusCodes.BAD_REQUEST).json({
+                    message: "Invalid pagination cursor"
+                });
+            }
+
+            filter.$or = [
+                { createdAt: { $lt: cursorDate } },
+                {
+                    createdAt: cursorDate,
+                    _id: {
+                        $lt: new mongoose.Types.ObjectId(cursorId)
+                    }
+                }
+            ]
+        }
+
+        let posts = await Post.find(filter)
+                                .sort({ createdAt: -1, _id: -1 })
+                                .limit(PAGE_SIZE + 1)
+                                .populate("author", "username name profilePicture")
+                                .populate("comments.author", "username name profilePicture");
+
+        const hasMore = posts.length>PAGE_SIZE;
+
+        if(hasMore){
+            posts = posts.slice(0, PAGE_SIZE);
+        }
+
+        const lastPost = posts[posts.length - 1];
+
+        const nextCursor = hasMore && lastPost
+            ? {
+                cursorCreatedAt: lastPost.createdAt,
+                cursorId: lastPost._id
+            }
+            : null;
+
+        return res.status(StatusCodes.OK).json({
+            posts,
+            hasMore,
+            nextCursor
+        });
+
+    } catch (error) {
+        console.error("Failed to fetch author's posts:", error);
+
+        return res.status(StatusCodes.INTERNAL_SERVER_ERROR).json({
+            message: "Failed to fetch profile posts"
+        });
     }
 }
