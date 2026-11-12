@@ -56,13 +56,22 @@ PeerPath includes an AI assistant powered by **Groq LLM and MCP (Model Context P
 
 The AI assistant does not automatically publish generated content. Users remain in control of the final post.
 
-### Cursor-Based Feed Pagination
-- Implemented cursor-based pagination to load posts in batches of 5.
+### Cursor-Based Post Pagination
+- Implemented cursor-based pagination for both the home feed and user profile posts, loading posts in batches of 5.
 - Uses `createdAt` and MongoDB `_id` as a compound cursor to ensure deterministic ordering.
 - Uses `$lt` conditions to fetch older posts without skipping posts that share the same timestamp.
 - Fetches one extra document (`PAGE_SIZE + 1`) to determine whether more posts are available.
-- Added a Load More button to fetch and append subsequent posts without reloading the feed.
+- Added a dedicated API endpoint (`GET /api/posts/author/:userId`) to fetch posts by a specific user.
+- Added Load More buttons to append subsequent posts without reloading the feed or profile.
 
+### Cursor-Based Profile Pagination
+
+- Implemented cursor-based pagination for user profile posts.
+- Added a dedicated API endpoint: `GET /api/posts/author/:userId`.
+- Fetches posts for a specific user in batches of 5.
+- Uses `createdAt` and MongoDB `_id` as a compound cursor for consistent ordering.
+- Fetches one extra document to determine whether more posts are available.
+- Added a Load More button to append subsequent posts without reloading the profile.
 ## AI Architecture
 
 PeerPath uses MCP to connect its AI assistant with the platform's backend services.
