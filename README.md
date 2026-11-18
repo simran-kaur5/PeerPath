@@ -1,12 +1,12 @@
-# PeerPath — Professional Networking Platform
+# PeerPath
 
 PeerPath is a full-stack professional networking platform that helps users build their professional identity, share updates, discover like-minded people, and expand their network.
 
-Users can create personalized profiles, publish posts, interact through likes and comments, connect with other professionals, and stay updated with notifications.
+Users can create personalized profiles, publish posts, interact through likes and comments, connect with other professionals, communicate through real-time chat, and stay updated with notifications.
 
 PeerPath also features an AI-powered assistant built with Groq and Model Context Protocol (MCP). It can retrieve real platform data, search posts, identify trending content, answer natural-language questions, and generate professional post drafts that users can review, edit, attach images to, and publish with their approval.
 
-Built using React, Node.js, Express.js, MongoDB, FastAPI, Groq, and MCP, PeerPath aims to make professional networking simple, engaging, and intelligent.
+Built using React, Node.js, Express.js, MongoDB, FastAPI, Groq, MCP, and Socket.IO, PeerPath aims to make professional networking simple, engaging, and intelligent.
 
 ## Live Demo
 
@@ -24,10 +24,24 @@ Explore the live application and try its features.
 - **Likes** — Like and unlike posts.
 - **Comments** — Add comments to posts and delete your own comments.
 - **People Discovery** — Explore users and discover professionals.
-- **Connection Management** — Send connection requests and check connection status.
+- **Connection Management** — Send connection requests and manage professional connections.
 - **Connection Status** — Identify pending sent requests, incoming requests, existing connections, and users who are not connected.
-- **Notifications** — Stay informed about relevant activity.
+- **Notifications** — Stay informed about relevant platform activity.
 - **Profile Pictures and Image Uploads** — Personalize profiles and share images.
+
+### Real-Time Chat System
+
+PeerPath includes a real-time one-to-one messaging system powered by Socket.IO.
+
+- **One-to-One Messaging** — Communicate privately with connected users.
+- **Real-Time Message Delivery** — Send and receive messages instantly without refreshing the page.
+- **Conversation Management** — Automatically create and retrieve conversations between users.
+- **Typing Indicators** — See when the other user is typing.
+- **Read Receipts** — Track when messages have been read.
+- **Unread Message Counts** — Display the number of unread messages in the Chats section.
+- **Message Deletion** — Delete your own messages, with changes synchronized across both users' chat windows.
+- **Live Conversation Previews** — Update the latest message preview when new messages arrive or existing messages are deleted.
+- **Socket-Based Synchronization** — Synchronize message delivery, deletion, typing status, and read status between connected users.
 
 ### AI-Powered Assistant
 
@@ -42,7 +56,6 @@ PeerPath includes an AI assistant powered by **Groq LLM and MCP (Model Context P
 - **MCP Tool Calling** — The LLM selects and invokes appropriate MCP tools based on user requests.
 - **Real-Time Application Data** — Retrieve actual post information through the PeerPath backend rather than relying on predefined responses.
 
-
 ## AI Post Generation and Publishing
 
 - **AI Post Drafting** — Generate professional networking posts using natural-language instructions.
@@ -56,22 +69,16 @@ PeerPath includes an AI assistant powered by **Groq LLM and MCP (Model Context P
 
 The AI assistant does not automatically publish generated content. Users remain in control of the final post.
 
-### Cursor-Based Post Pagination
-- Implemented cursor-based pagination for both the home feed and user profile posts, loading posts in batches of 5.
+## Cursor-Based Post Pagination
+
+- Implemented cursor-based pagination for both the home feed and user profile posts.
+- Loads posts in batches of 5.
 - Uses `createdAt` and MongoDB `_id` as a compound cursor to ensure deterministic ordering.
 - Uses `$lt` conditions to fetch older posts without skipping posts that share the same timestamp.
 - Fetches one extra document (`PAGE_SIZE + 1`) to determine whether more posts are available.
 - Added a dedicated API endpoint (`GET /api/posts/author/:userId`) to fetch posts by a specific user.
 - Added Load More buttons to append subsequent posts without reloading the feed or profile.
 
-### Cursor-Based Profile Pagination
-
-- Implemented cursor-based pagination for user profile posts.
-- Added a dedicated API endpoint: `GET /api/posts/author/:userId`.
-- Fetches posts for a specific user in batches of 5.
-- Uses `createdAt` and MongoDB `_id` as a compound cursor for consistent ordering.
-- Fetches one extra document to determine whether more posts are available.
-- Added a Load More button to append subsequent posts without reloading the profile.
 ## AI Architecture
 
 PeerPath uses MCP to connect its AI assistant with the platform's backend services.
@@ -88,7 +95,7 @@ PeerPath uses MCP to connect its AI assistant with the platform's backend servic
                v
            Groq LLM
                |
-        Tool Selection
+         Tool Selection
                |
                v
            MCP Server
@@ -97,9 +104,9 @@ PeerPath uses MCP to connect its AI assistant with the platform's backend servic
          Express REST API
                |
                v
-           MongoDB
+            MongoDB
                |
-        Tool Response
+         Tool Response
                |
                v
           Groq LLM
@@ -111,7 +118,7 @@ PeerPath uses MCP to connect its AI assistant with the platform's backend servic
              User
 ```
 
-**AI Post Publishing Workflow**
+### AI Post Publishing Workflow
 
 ```text
           User Request
@@ -147,7 +154,7 @@ PeerPath uses MCP to connect its AI assistant with the platform's backend servic
        Explicit User Approval
                 |
                 v
-         FastAPI /publish
+          FastAPI /publish
                 |
                 v
         Express Backend API
@@ -162,7 +169,7 @@ PeerPath uses MCP to connect its AI assistant with the platform's backend servic
         Post Published on Feed
 ```
 
-**How the AI Assistant Works**
+### How the AI Assistant Works
 
 1. The user sends a natural-language query through the AI chat interface.
 2. FastAPI forwards the request to the AI assistant.
@@ -172,11 +179,10 @@ PeerPath uses MCP to connect its AI assistant with the platform's backend servic
 6. The retrieved results are sent back to the LLM.
 7. Groq generates a contextual response for the user.
 
-
-**How AI Post Publishing Works**
+### How AI Post Publishing Works
 
 1. The user asks PeerPath AI to create a post.
-2. Groq selects the draft_post MCP tool.
+2. Groq selects the `draft_post` MCP tool.
 3. The assistant generates a draft and displays its complete content.
 4. The user can request revisions or attach an optional image.
 5. The user explicitly approves publishing.
@@ -185,12 +191,46 @@ PeerPath uses MCP to connect its AI assistant with the platform's backend servic
 8. Express processes the image upload through Multer and Cloudinary.
 9. The post is saved in MongoDB and becomes available on the PeerPath feed.
 
+## Real-Time Chat Architecture
+
+PeerPath uses Socket.IO to provide real-time communication between connected users.
+
+```text
+          User A                     User B
+             |                          |
+             v                          v
+        React Chat UI              React Chat UI
+             |                          |
+             +------------+-------------+
+                          |
+                          v
+                     Socket.IO
+                          |
+                          v
+                   Express Backend
+                          |
+                          v
+                       MongoDB
+                          |
+                          v
+               Message and Conversation
+                      Storage
+```
+
+The chat system uses:
+
+- Express APIs for creating conversations, sending messages, retrieving messages, marking messages as read, and deleting messages.
+- MongoDB to persist conversations and messages.
+- Socket.IO events to synchronize new messages, deleted messages, typing indicators, and read receipts.
+- Session-based authentication to identify connected users.
+
 ## Tech Stack
 
 | Category | Technologies |
 |---|---|
 | Frontend | React, Vite, React Router, Axios, Material UI |
 | Backend | Node.js, Express.js |
+| Real-Time Communication | Socket.IO, Socket.IO Client |
 | Database | MongoDB Atlas, Mongoose |
 | Authentication | Passport.js, Express Session, Connect-Mongo, JWT |
 | Image Storage | Cloudinary |
@@ -251,6 +291,8 @@ SECRET=your_session_secret
 NODE_ENV=development
 ```
 
+Configure the remaining backend environment variables required by your application.
+
 Start the backend:
 
 ```bash
@@ -264,27 +306,10 @@ Open another terminal:
 ```bash
 cd frontend
 npm install
-```
-
-Configure the frontend API endpoints to use your local backend:
-
-```text
-http://localhost:5000
-```
-
-Configure the AI API endpoint in `frontend/src/components/AIChat/AIChat.jsx`:
-
-```javascript
-const AI_API = "http://localhost:8000";
-```
-
-Start the frontend:
-
-```bash
 npm run dev
 ```
 
-Open http://localhost:5173 in your browser.
+Configure the frontend API URLs to point to your local backend and AI service.
 
 ### 4. AI / MCP Server Setup
 
