@@ -11,9 +11,16 @@ import LocalStrategy from "passport-local"
 import MongoStore from "connect-mongo";
 import connection from "./routes/connection.js"
 import notifications from "./routes/notifications.js"
+import conversation from "./routes/conversation.js";
+import message from "./routes/message.js";
+
+import {createServer} from "http"
+import { initializeSocket } from "./socket.js";
 
 const app = express()
 dotenv.config();
+
+const httpServer = createServer(app);
 
 const dbUrl = process.env.MONGODB_URL
 const isProduction = process.env.NODE_ENV === "production";
@@ -65,7 +72,9 @@ app.use(cors({
 
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
-app.use(session(sessionOptions))
+const sessionMiddleware = session(sessionOptions)
+
+app.use(sessionMiddleware)
 
 app.use(passport.initialize())
 app.use(passport.session())
@@ -78,6 +87,8 @@ app.use("/posts", post);
 app.use("/users", user);
 app.use("/connections",connection)
 app.use("/notifications", notifications);
+app.use("/conversations", conversation);
+app.use("/messages", message);
 
 const PORT = process.env.PORT || 5000;
 
@@ -88,11 +99,18 @@ async function main(){
         if(response){
             console.log("Database connected")
         }
+
+        httpServer.listen(PORT,()=>{
+            console.log("Server listening on port",PORT)
+        })
     }catch(error){
         console.log(error)
     }
 }
 
+const io = initializeSocket(httpServer, allowedOrigins,sessionMiddleware);
+
+app.set("io", io)
 main()
 
 
@@ -108,8 +126,3 @@ app.use((err, req, res, next) => {
         message: err.message || "Something went wrong. Please try again later." 
     });
 });
-
-
-app.listen(PORT,()=>{
-    console.log("Server listing")
-})

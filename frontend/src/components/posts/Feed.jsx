@@ -3,7 +3,7 @@ import { useState } from "react";
 import { useEffect } from "react";
 import CreatePost from "./CreatePost.jsx";
 import SuggestedConnections from "../connections/SuggestedConnections";
-import { ThumbsUp,ChevronUp, ChevronDown, CornerDownLeft } from "lucide-react";
+import { ThumbsUp,ChevronUp, ChevronDown } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { postAPI, userAPI } from "../../services/api";
 import { Bot } from "lucide-react";
@@ -62,7 +62,7 @@ export default function Feed() {
         if(!hasMore || !nextCursor || loadingMore) return;
 
         try{
-            setLoading(true)
+            setLoadingMore(true)
 
             const response = await postAPI.get("/",{
                 params: nextCursor

@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { connectionAPI } from "../../services/api";
+import { connectionAPI, conversationAPI } from "../../services/api";
 import { UserRound, MapPin } from "lucide-react";
 import { Button } from "@mui/material";
 import { useNavigate } from "react-router-dom";
@@ -10,6 +10,7 @@ export default function MyConnections(){
     const [connections, setConnections] = useState([])
     const [loading, setLoading] = useState(true)
     const [error, setError] = useState("")
+    const [openingChat, setOpeningChat] = useState(null);
     
     const navigate = useNavigate()
 
@@ -28,6 +29,23 @@ export default function MyConnections(){
 
         fetchConnections()
     },[])
+
+    const handleMessage = async (otherUserId) =>{
+        try{
+            setOpeningChat(otherUserId)
+
+            const response = await conversationAPI.post("/", {
+                otherUserId
+            })
+
+            const conversationId = response.data.conversation._id
+            navigate(`/chat/${conversationId}`)
+        }catch(error){
+            console.error("Error in opening conversation", error.response?.data?.message || error.message)
+        }finally{
+            setOpeningChat(null)
+        }
+    }
 
     return (
         <div className="my-connections-page">
@@ -88,6 +106,11 @@ export default function MyConnections(){
                         >
                         View Profile
                     </Button>
+                    <Button variant="contained" disabled={openingChat===person._id}
+                        onClick={()=> handleMessage(person._id)}
+                        >
+                        {openingChat === person._id ? "Opening...": "Message"}
+                        </Button>
                 </article>
             ))}
       </div>

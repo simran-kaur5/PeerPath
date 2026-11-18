@@ -109,6 +109,10 @@ export default function Navbar(){
                     </>
                 )}
 
+                <div onClick={() => navigate("/chats")}>
+                    Chats
+                </div>
+
                 { !authLoading &&
                     isLogin?(
                         <>

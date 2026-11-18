@@ -10,6 +10,8 @@ import Delete from "./pages/posts/Delete.jsx";
 import Profile from "./pages/profile/Profile";
 import EditProfile from "./pages/profile/EditProfile";
 import PublicView from "./pages/profile/PublicView";
+import Chat from "./pages/Chat";
+import Chats from "./pages/Chats.jsx";
 
 // Components
 import Feed from "./components/posts/Feed";
@@ -63,6 +65,8 @@ function App() {
                 <Route path="/people" element={<People />} />
                 <Route path="/people/:id" element={<PublicView />} />
                 <Route path="/connections" element={<MyConnections />} />
+                <Route path="/chats" element={<Chats />} />
+                <Route path="/chat/:conversationId" element={<Chat />} />
 
                 <Route path="/connections/requests" element={<ConnectionRequests />}/>
                 <Route path="/notifications" element={<Notification/>} />
